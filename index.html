@@ -484,7 +484,7 @@ async function uploadImageForAPI(base64DataUrl) {
   // Use MuAPI's own upload endpoint — returns URLs already in their allowlist
   const fd = new FormData();
   fd.append('file', file);
-  const res = await fetch('https://api.muapi.ai/api/v1/upload_file', {
+  const res = await fetch('https://corsproxy.io/?url=' + encodeURIComponent('https://api.muapi.ai/api/v1/upload_file'), {
     method: 'POST',
     headers: { 'x-api-key': apiKey },
     body: fd
@@ -758,7 +758,7 @@ async function generate(){
   else if(!info.isAudio && !info.noPrompt){ body.aspect_ratio=currentImgRatio; }
 
   try {
-    const res = await fetch(`https://api.muapi.ai/api/v1/${model.ep}`, {
+    const res = await fetch(`https://corsproxy.io/?url=${encodeURIComponent(`https://api.muapi.ai/api/v1/${model.ep}`)}`, {
       method:'POST', headers:{'Content-Type':'application/json','x-api-key':apiKey},
       body: JSON.stringify(body)
     });
@@ -772,7 +772,7 @@ async function generate(){
     while(attempts<90){
       await sleep(2500); attempts++;
       setProgress(Math.min(92, 30+attempts*1.5));
-      const poll = await fetch(`https://api.muapi.ai/api/v1/predictions/${reqId}/result`,{headers:{'x-api-key':apiKey}});
+      const poll = await fetch(`https://corsproxy.io/?url=${encodeURIComponent(`https://api.muapi.ai/api/v1/predictions/${reqId}/result`)}`,{headers:{'x-api-key':apiKey}});
       const pd = await poll.json();
       if(pd.status==='completed'||pd.status==='succeeded'){
         const url = pd.url||pd.outputs?.[0]||pd.output?.[0];
