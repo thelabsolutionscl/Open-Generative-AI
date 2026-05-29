@@ -411,9 +411,11 @@ const MODELS = {
     {id:'pixart',       hf:'PixArt-alpha/PixArt-Sigma-XL-2-1024-MS', name:'PixArt Sigma', badge:'PixArt', bc:'#06b6d4', desc:'Alta res'},
   ],
   edit: [
-    {id:'ip2p',     hf:'timbrooks/instruct-pix2pix', name:'InstructPix2Pix', badge:'Edit', bc:'#a78bfa', desc:'Edición instruccional'},
-    {id:'sdxl-ref', hf:'stabilityai/stable-diffusion-xl-refiner-1.0', name:'SDXL Refiner', badge:'Refine', bc:'#60a5fa', desc:'Refinado SDXL'},
-    {id:'img2img',  hf:'runwayml/stable-diffusion-v1-5', name:'SD 1.5 Img2Img', badge:'I2I', bc:'#34d399', desc:'Img2Img clásico'},
+    {id:'ip2p',       hf:'timbrooks/instruct-pix2pix',                     name:'InstructPix2Pix', badge:'Edit',   bc:'#a78bfa', desc:'Edición instruccional'},
+    {id:'flux-fill',  hf:'black-forest-labs/FLUX.1-schnell',               name:'Flux Style',      badge:'Flux',   bc:'#22d3ee', desc:'Estilo con Flux'},
+    {id:'sdxl-ref',   hf:'stabilityai/stable-diffusion-xl-refiner-1.0',    name:'SDXL Refiner',    badge:'Refine', bc:'#60a5fa', desc:'Refinado SDXL'},
+    {id:'kandinsky',  hf:'kandinsky-community/kandinsky-2-2-decoder',       name:'Kandinsky 2.2',   badge:'K2',     bc:'#f472b6', desc:'Artístico ruso'},
+    {id:'lcm-lora',   hf:'latent-consistency/lcm-lora-sdxl',               name:'LCM LoRA SDXL',   badge:'Fast',   bc:'#34d399', desc:'Ultra rápido'},
   ],
   i2v: [
     {id:'i2vgen',   hf:'ali-vilab/i2vgen-xl', name:'I2VGen-XL', badge:'Ali', bc:'#f472b6', desc:'Imagen a video'},
@@ -424,11 +426,14 @@ const MODELS = {
     {id:'zeroscope',hf:'cerspense/zeroscope_v2_576w', name:'ZeroScope v2', badge:'Zero', bc:'#f43f5e', desc:'Rápido'},
   ],
   enhance: [
-    {id:'upscale',  hf:'caidas/swin2SR-classical-sr-x2-64', name:'Swin2SR 2x', badge:'2x', bc:'#60a5fa', desc:'Upscale 2x'},
-    {id:'upscale4', hf:'caidas/swin2SR-realworld-sr-x4-64-bsrgan-psnr', name:'Swin2SR 4x', badge:'4x', bc:'#22d3ee', desc:'Upscale 4x'},
-    {id:'colorize', hf:'eimiss/EimisAnimeDiffusion_1.0v', name:'Colorize', badge:'Color', bc:'#fbbf24', desc:'Colorizar'},
-    {id:'depth',    hf:'depth-anything/Depth-Anything-V2-Small-hf', name:'Depth Map', badge:'Depth', bc:'#34d399', desc:'Mapa de profundidad'},
-    {id:'seg',      hf:'mattmdjaga/segformer_b2_clothes', name:'Segmentación', badge:'Seg', bc:'#f472b6', desc:'Segmentar ropa'},
+    {id:'upscale',   hf:'caidas/swin2SR-classical-sr-x2-64',              name:'Swin2SR 2x',    badge:'2x',    bc:'#60a5fa', desc:'Upscale 2x'},
+    {id:'upscale4',  hf:'caidas/swin2SR-compressed-sr-x4-48',             name:'Swin2SR 4x',    badge:'4x',    bc:'#22d3ee', desc:'Upscale 4x'},
+    {id:'realesrgan',hf:'ai-forever/Real-ESRGAN',                         name:'Real-ESRGAN',   badge:'Photo', bc:'#34d399', desc:'Foto realista'},
+    {id:'gfpgan',    hf:'tencentarc/gfpgan',                              name:'GFPGAN',        badge:'Face',  bc:'#f472b6', desc:'Restaura caras'},
+    {id:'depth',     hf:'Intel/dpt-large',                                name:'Depth Map',     badge:'Depth', bc:'#fbbf24', desc:'Profundidad'},
+    {id:'seg',       hf:'facebook/maskformer-swin-large-coco',            name:'Segmentación',  badge:'Seg',   bc:'#fb923c', desc:'Segmentar objetos'},
+    {id:'caption',   hf:'Salesforce/blip-image-captioning-large',         name:'BLIP Caption',  badge:'Cap',   bc:'#a78bfa', desc:'Describe imagen'},
+    {id:'nsfw',      hf:'Falconsai/nsfw_image_detection',                 name:'Detector NSFW', badge:'Det',   bc:'#94a3b8', desc:'Clasifica contenido'},
   ],
   audio: [
     {id:'musicgen-sm',  hf:'facebook/musicgen-small',  name:'MusicGen Small',  badge:'Fast', bc:'#fbbf24', desc:'Música rápida'},
@@ -656,50 +661,54 @@ async function generate(sec) {
 
 // ── HF API CALLS ──────────────────────────────────────────────────────────────
 async function hfCall(modelHf, payload, isJson = true) {
-  setLoadTxt('Generando con '+modelHf.split('/')[1]+'...');
+  setLoadTxt('Generando con ' + modelHf.split('/')[1] + '...');
   setProgress(20);
 
-  // Try main API first, then router
-  const urls = [HF_API + modelHf, HF_ROUTER + modelHf];
+  // Use router (more reliable for serverless inference)
+  const url = HF_ROUTER + modelHf;
+  const headers = {
+    'Authorization': 'Bearer ' + hfKey,
+    'x-wait-for-model': 'true',  // wait instead of 503
+  };
+  if (isJson) headers['Content-Type'] = 'application/json';
 
-  for (const url of urls) {
-    try {
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Authorization': 'Bearer ' + hfKey,
-          ...(isJson ? {'Content-Type': 'application/json'} : {}),
-        },
-        body: isJson ? JSON.stringify(payload) : payload,
-      });
+  setLoadTxt('Esperando modelo (puede tardar 1-2 min la primera vez)...');
+  setProgress(25);
 
-      // Model loading - wait and retry
-      if (res.status === 503) {
-        const d = await res.json();
-        const wait = Math.min((d.estimated_time || 20) * 1000, 60000);
-        setLoadTxt(`Modelo cargando... ~${Math.round(wait/1000)}s`);
-        setProgress(30);
-        await sleep(wait);
-        // Retry
-        const res2 = await fetch(url, {
-          method:'POST',
-          headers:{'Authorization':'Bearer '+hfKey,...(isJson?{'Content-Type':'application/json'}:{})},
-          body: isJson ? JSON.stringify(payload) : payload,
-        });
-        if (res2.ok) { setProgress(90); return await res2.blob(); }
-        throw new Error(`Error ${res2.status}: ${await res2.text().then(t=>t.slice(0,100))}`);
-      }
+  const res = await fetch(url, {
+    method: 'POST',
+    headers,
+    body: isJson ? JSON.stringify(payload) : payload,
+  });
 
-      if (!res.ok) {
-        const txt = await res.text();
-        throw new Error(`Error ${res.status}: ${txt.slice(0,120)}`);
-      }
-      setProgress(90);
-      return await res.blob();
-    } catch(e) {
-      if (url === urls[urls.length-1]) throw e;
-    }
+  if (res.status === 503 || res.status === 504) {
+    // Explicit warmup wait
+    setLoadTxt('Modelo calentando, espera...');
+    setProgress(35);
+    await sleep(30000);
+    const res2 = await fetch(url, { method: 'POST', headers, body: isJson ? JSON.stringify(payload) : payload });
+    if (res2.ok) { setProgress(90); return await res2.blob(); }
+    const t2 = await res2.text();
+    throw new Error(`Error ${res2.status}: ${t2.slice(0, 120)}`);
   }
+
+  if (!res.ok) {
+    const txt = await res.text();
+    // Better error messages
+    if (txt.includes('not supported by provider')) {
+      throw new Error('Este modelo no soporta Inference API gratuita. Prueba otro modelo.');
+    }
+    if (txt.includes('Authorization') || res.status === 401) {
+      throw new Error('Token inválido. Verifica tu HF token en el botón HF Key.');
+    }
+    if (res.status === 429) {
+      throw new Error('Límite de rate alcanzado. Espera 1 minuto e intenta de nuevo.');
+    }
+    throw new Error(`Error ${res.status}: ${txt.slice(0, 120)}`);
+  }
+
+  setProgress(90);
+  return await res.blob();
 }
 
 async function hfT2I(hf, prompt, negPrompt) {
@@ -737,6 +746,10 @@ async function hfT2V(hf, prompt) {
 
 async function hfEnhance(hf, imgData, prompt) {
   const imgB64 = await toB64(imgData);
+  // Caption/classify models just need the image
+  if (hf.includes('blip') || hf.includes('nsfw') || hf.includes('maskformer') || hf.includes('dpt') || hf.includes('Intel/dpt')) {
+    return hfCall(hf, { inputs: imgB64 });
+  }
   return hfCall(hf, { inputs: imgB64, parameters: prompt ? { prompt } : {} });
 }
 
