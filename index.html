@@ -3,1235 +3,892 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>OpenGen Studio</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>OpenGen Studio — Free AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#06070a;--s1:#0d0f14;--s2:#13151c;--bd:#1e2130;--bd2:#2a2e42;--tx:#e4e8f4;--tx2:#6b7494;--tx3:#323750;--c:#22d3ee;--v:#a78bfa;--p:#f472b6;--o:#fb923c;--g:#34d399;--y:#fbbf24;--b:#60a5fa;--r:#f87171;--a:var(--c);}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;overflow:hidden;}
 
-/* NAV BOTTOM (mobile) */
-#nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:rgba(13,15,20,.97);border-top:1px solid var(--bd);display:flex;z-index:100;backdrop-filter:blur(20px);}
-.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;color:var(--tx3);font-family:'DM Sans',sans-serif;font-size:9px;font-weight:600;cursor:pointer;transition:color .15s;letter-spacing:.3px;text-transform:uppercase;}
-.nav-btn .nav-icon{font-size:18px;line-height:1;}
-.nav-btn.active{color:var(--a);}
-
-/* TOP BAR */
-#topbar{position:fixed;top:0;left:0;right:0;height:50px;background:rgba(6,7,10,.97);border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 14px;gap:10px;z-index:100;backdrop-filter:blur(20px);}
+#topbar{position:fixed;top:0;left:0;right:0;height:52px;background:rgba(6,7,10,.97);border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 14px;gap:10px;z-index:100;backdrop-filter:blur(20px);}
 #logo{display:flex;align-items:center;gap:7px;}
-#logo-icon{width:26px;height:26px;border-radius:6px;background:linear-gradient(135deg,var(--a),#6366f1);display:flex;align-items:center;justify-content:center;font-size:13px;transition:background .3s;}
-#logo-text{font-family:'Syne',sans-serif;font-weight:800;font-size:15px;letter-spacing:-.3px;}
+#logo-icon{width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,var(--a),#6366f1);display:flex;align-items:center;justify-content:center;font-size:14px;transition:background .3s;}
+#logo-text{font-family:'Syne',sans-serif;font-weight:800;font-size:16px;letter-spacing:-.3px;}
 #logo-text span{color:var(--a);transition:color .3s;}
+#logo-free{font-size:9px;background:rgba(34,211,238,.12);border:1px solid rgba(34,211,238,.25);border-radius:4px;padding:2px 6px;color:var(--c);font-family:'DM Mono',monospace;}
 #topbar-right{margin-left:auto;display:flex;gap:6px;}
 .top-btn{background:rgba(255,255,255,.05);border:1px solid var(--bd);border-radius:7px;color:var(--tx2);font-family:'DM Sans',sans-serif;font-size:11px;padding:5px 10px;cursor:pointer;}
 .top-btn.ok{border-color:rgba(34,211,238,.3);color:var(--c);background:rgba(34,211,238,.07);}
 .top-btn.err{border-color:rgba(248,113,113,.3);color:var(--r);background:rgba(248,113,113,.07);}
 
-/* MAIN AREA */
-#main{position:fixed;top:50px;bottom:60px;left:0;right:0;overflow:hidden;display:flex;flex-direction:column;}
+#nav{position:fixed;bottom:0;left:0;right:0;height:58px;background:rgba(13,15,20,.97);border-top:1px solid var(--bd);display:flex;z-index:100;backdrop-filter:blur(20px);}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;color:var(--tx3);font-family:'DM Sans',sans-serif;font-size:9px;font-weight:600;cursor:pointer;transition:color .15s;letter-spacing:.3px;text-transform:uppercase;padding:0;}
+.nav-btn .ni{font-size:17px;line-height:1;}
+.nav-btn.active{color:var(--a);}
 
-/* SECTION SCREEN */
+#main{position:fixed;top:52px;bottom:58px;left:0;right:0;overflow:hidden;}
 .screen{display:none;flex-direction:column;height:100%;overflow:hidden;}
 .screen.active{display:flex;}
-
-/* SCROLL AREA */
 .scroll{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;-webkit-overflow-scrolling:touch;}
 .scroll::-webkit-scrollbar{display:none;}
 
-/* CARDS */
 .card{background:rgba(255,255,255,.03);border:1px solid var(--bd);border-radius:12px;padding:12px;}
-.card-label{font-family:'DM Mono',monospace;font-size:9px;font-weight:500;color:var(--tx3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+.lbl{font-family:'DM Mono',monospace;font-size:9px;font-weight:500;color:var(--tx3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
 
-/* MODEL SELECTOR */
-.model-scroll{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;}
-.model-scroll::-webkit-scrollbar{display:none;}
-.model-chip{flex-shrink:0;background:rgba(255,255,255,.03);border:1px solid var(--bd);border-radius:8px;padding:7px 10px;cursor:pointer;transition:all .12s;}
-.model-chip.sel{background:color-mix(in srgb,var(--a) 12%,transparent);border-color:var(--a);}
-.mc-name{font-size:12px;font-weight:600;color:var(--tx2);white-space:nowrap;}
-.model-chip.sel .mc-name{color:var(--a);}
-.mc-meta{display:flex;align-items:center;gap:4px;margin-top:2px;}
-.mc-badge{border-radius:3px;padding:1px 5px;font-size:9px;font-weight:700;font-family:'DM Mono',monospace;white-space:nowrap;}
-.mc-desc{font-size:10px;color:var(--tx3);white-space:nowrap;}
+/* Model chips */
+.mscroll{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;}
+.mscroll::-webkit-scrollbar{display:none;}
+.mchip{flex-shrink:0;background:rgba(255,255,255,.03);border:1px solid var(--bd);border-radius:9px;padding:8px 11px;cursor:pointer;transition:all .12s;min-width:100px;}
+.mchip.sel{background:color-mix(in srgb,var(--a) 12%,transparent);border-color:var(--a);}
+.mn{font-size:12px;font-weight:600;color:var(--tx2);white-space:nowrap;margin-bottom:3px;}
+.mchip.sel .mn{color:var(--a);}
+.mm{display:flex;align-items:center;gap:4px;}
+.mb{border-radius:3px;padding:1px 5px;font-size:9px;font-weight:700;font-family:'DM Mono',monospace;}
+.md{font-size:10px;color:var(--tx3);white-space:nowrap;}
 
-/* PROMPT */
-.prompt-ta{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--bd2);border-radius:10px;color:var(--tx);font-size:14px;font-family:'DM Sans',sans-serif;resize:none;outline:none;padding:11px 13px;transition:border-color .2s;min-height:80px;}
-.prompt-ta:focus{border-color:var(--a);}
-.prompt-hint{display:flex;justify-content:space-between;margin-top:4px;}
-.prompt-hint span{font-size:10px;color:var(--tx3);}
-.ex-btn{background:none;border:none;color:var(--a);font-size:10px;font-family:'DM Sans',sans-serif;cursor:pointer;}
+/* Status indicator on chip */
+.mstatus{width:6px;height:6px;border-radius:50%;background:var(--tx3);flex-shrink:0;}
+.mstatus.free{background:var(--g);}
+.mstatus.loading{background:var(--y);animation:pulse 1s infinite;}
+.mstatus.error{background:var(--r);}
 
-/* PILLS */
-.pill-row{display:flex;flex-wrap:wrap;gap:5px;}
+/* Textarea */
+.pta{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--bd2);border-radius:10px;color:var(--tx);font-size:14px;font-family:'DM Sans',sans-serif;resize:none;outline:none;padding:11px 13px;transition:border-color .2s;min-height:85px;}
+.pta:focus{border-color:var(--a);}
+.phint{display:flex;justify-content:space-between;margin-top:4px;}
+.phint span{font-size:10px;color:var(--tx3);}
+.exbtn{background:none;border:none;color:var(--a);font-size:10px;cursor:pointer;font-family:'DM Sans',sans-serif;}
+
+/* Pills */
+.pr{display:flex;flex-wrap:wrap;gap:5px;}
 .pill{background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:6px;padding:5px 10px;cursor:pointer;font-size:11px;color:var(--tx3);font-family:'DM Mono',monospace;transition:all .12s;}
 .pill.on{color:var(--a);border-color:color-mix(in srgb,var(--a) 50%,transparent);background:color-mix(in srgb,var(--a) 10%,transparent);}
 
-/* UPLOAD */
-.drop-zone{border:1.5px dashed var(--bd2);border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:all .2s;}
-.drop-zone:active{border-color:var(--a);background:color-mix(in srgb,var(--a) 5%,transparent);}
-.upload-preview{position:relative;border-radius:10px;overflow:hidden;}
-.upload-preview img{width:100%;max-height:180px;object-fit:cover;display:block;border-radius:10px;}
-.upload-clear{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.75);border:none;border-radius:5px;color:#fff;width:24px;height:24px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;}
+/* Upload */
+.dz{border:1.5px dashed var(--bd2);border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:all .2s;}
+.dz:active{border-color:var(--a);background:color-mix(in srgb,var(--a) 5%,transparent);}
+.uprev{position:relative;border-radius:10px;overflow:hidden;}
+.uprev img{width:100%;max-height:180px;object-fit:cover;display:block;border-radius:10px;}
+.upclear{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.75);border:none;border-radius:5px;color:#fff;width:24px;height:24px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;}
+.urlinput{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--bd2);border-radius:8px;color:var(--tx);font-size:12px;font-family:'DM Mono',monospace;outline:none;padding:9px 11px;margin-top:8px;transition:border-color .2s;}
+.urlinput:focus{border-color:var(--a);}
+.divider{display:flex;align-items:center;gap:8px;margin-top:8px;}
+.divider span{font-size:10px;color:var(--tx3);}
+.divider div{flex:1;height:1px;background:var(--bd);}
 
-/* URL INPUT */
-.url-input{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--bd2);border-radius:8px;color:var(--tx);font-size:12px;font-family:'DM Mono',monospace;outline:none;padding:9px 11px;transition:border-color .2s;}
-.url-input:focus{border-color:var(--a);}
+/* Negative prompt toggle */
+.neg-toggle{display:flex;align-items:center;gap:6px;cursor:pointer;font-size:11px;color:var(--tx3);margin-top:6px;}
+.neg-toggle input{accent-color:var(--a);}
+.neg-ta{width:100%;background:rgba(255,255,255,.03);border:1px solid var(--bd);border-radius:8px;color:var(--tx2);font-size:12px;font-family:'DM Sans',sans-serif;resize:none;outline:none;padding:9px 11px;margin-top:6px;min-height:50px;transition:border-color .2s;}
+.neg-ta:focus{border-color:var(--a);}
 
-/* GEN BUTTON */
-.gen-btn-wrap{padding:0 0 12px;flex-shrink:0;}
-.gen-btn{width:100%;height:50px;border:none;border-radius:14px;color:#fff;font-size:16px;font-weight:700;font-family:'Syne',sans-serif;cursor:pointer;transition:all .2s;letter-spacing:.3px;}
-.gen-btn:disabled{opacity:.35;cursor:not-allowed;}
-.gen-btn:not(:disabled):active{transform:scale(.98);}
+/* Gen button */
+.gbwrap{padding:0 0 10px;flex-shrink:0;}
+.gbtn{width:100%;height:50px;border:none;border-radius:14px;color:#fff;font-size:16px;font-weight:700;font-family:'Syne',sans-serif;cursor:pointer;transition:all .2s;letter-spacing:.3px;}
+.gbtn:disabled{opacity:.35;cursor:not-allowed;}
+.gbtn:not(:disabled):active{transform:scale(.98);}
 
-/* RESULT */
-#result-panel{position:fixed;top:50px;bottom:60px;left:0;right:0;background:var(--bg);z-index:50;display:none;flex-direction:column;}
-#result-panel.show{display:flex;}
-#result-topbar{display:flex;align-items:center;padding:10px 14px;border-bottom:1px solid var(--bd);gap:10px;flex-shrink:0;}
-#back-btn{background:none;border:none;color:var(--tx2);font-size:20px;cursor:pointer;padding:2px;}
-#result-title{font-size:13px;font-weight:600;color:var(--tx2);}
-#result-scroll{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;}
+/* Result panel */
+#rp{position:fixed;top:52px;bottom:58px;left:0;right:0;background:var(--bg);z-index:50;display:none;flex-direction:column;}
+#rp.show{display:flex;}
+#rtop{display:flex;align-items:center;padding:10px 14px;border-bottom:1px solid var(--bd);gap:10px;flex-shrink:0;}
+#rbk{background:none;border:none;color:var(--tx2);font-size:22px;cursor:pointer;line-height:1;padding:0;}
+#rtitle{font-size:13px;font-weight:600;color:var(--tx2);}
+#rmodel{margin-left:auto;font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace;}
+#rscroll{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;}
+#rscroll::-webkit-scrollbar{display:none;}
 
-.result-img{width:100%;border-radius:12px;display:block;}
-.result-vid{width:100%;border-radius:12px;display:block;background:#000;}
-.result-audio-wrap{background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.15);border-radius:12px;padding:16px;display:flex;align-items:center;gap:12px;}
-.result-audio-wrap audio{flex:1;}
+.rimg{width:100%;border-radius:12px;display:block;cursor:pointer;}
+.rvid{width:100%;border-radius:12px;display:block;background:#000;}
+.raudio{background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.15);border-radius:12px;padding:16px;display:flex;align-items:center;gap:12px;}
+.raudio audio{flex:1;}
+.rbtn-row{display:flex;gap:8px;}
+.rbtn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:rgba(255,255,255,.05);border:1px solid var(--bd);border-radius:10px;color:var(--tx2);padding:12px;font-size:13px;font-weight:600;text-decoration:none;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;}
+.rbtn:active{background:rgba(255,255,255,.08);}
+.rprompt-card{background:rgba(255,255,255,.025);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;font-size:12px;color:var(--tx3);line-height:1.5;font-style:italic;}
 
-.dl-btn{display:flex;align-items:center;justify-content:center;gap:6px;background:rgba(255,255,255,.05);border:1px solid var(--bd);border-radius:10px;color:var(--tx2);padding:12px;font-size:13px;font-weight:600;text-decoration:none;transition:all .15s;}
-.dl-btn:active{background:rgba(255,255,255,.08);}
+/* Loading */
+.lwrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:40px;}
+.spin{width:50px;height:50px;border:3px solid rgba(255,255,255,.06);border-top-color:var(--a);border-radius:50%;animation:spin .9s linear infinite;}
+.ltxt{font-size:13px;color:var(--tx2);text-align:center;}
+.lpct{font-family:'DM Mono',monospace;font-size:11px;color:var(--tx3);}
+.lbarw{width:180px;height:2px;background:var(--bd);border-radius:1px;overflow:hidden;}
+.lbar{height:100%;border-radius:1px;transition:width .5s ease;}
+.lhint{font-size:10px;color:var(--tx3);text-align:center;max-width:240px;line-height:1.4;}
 
-/* LOADING */
-.loading-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:40px;}
-.spinner{width:48px;height:48px;border:3px solid rgba(255,255,255,.06);border-top-color:var(--a);border-radius:50%;animation:spin .9s linear infinite;}
-.loading-txt{font-size:13px;color:var(--tx2);}
-.loading-pct{font-family:'DM Mono',monospace;font-size:11px;color:var(--tx3);}
-.pbar-wrap{width:160px;height:2px;background:var(--bd);border-radius:1px;overflow:hidden;}
-.pbar{height:100%;border-radius:1px;transition:width .6s ease;}
+/* Error */
+.ewrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:30px;text-align:center;}
+.eicon{font-size:38px;}
+.etitle{font-size:15px;font-weight:600;color:var(--r);}
+.emsg{font-size:12px;color:var(--tx3);line-height:1.6;max-width:280px;}
+.eback{background:rgba(255,255,255,.06);border:1px solid var(--bd);border-radius:8px;color:var(--tx2);padding:10px 20px;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:8px;font-size:13px;}
 
-/* ERROR */
-.error-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:30px;text-align:center;}
-.error-icon{font-size:36px;}
-.error-title{font-size:15px;font-weight:600;color:var(--r);}
-.error-msg{font-size:12px;color:var(--tx3);line-height:1.5;}
+/* History */
+#hs{display:none;flex-direction:column;height:100%;overflow:hidden;}
+#hs.active{display:flex;}
+.hgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px;}
+.hitem{border-radius:10px;overflow:hidden;border:1px solid var(--bd);position:relative;aspect-ratio:1;cursor:pointer;background:var(--s2);}
+.hitem img{width:100%;height:100%;object-fit:cover;display:block;}
+.hph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:28px;}
+.hlbl{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.8));padding:8px 6px 4px;font-size:9px;color:rgba(255,255,255,.6);font-family:'DM Mono',monospace;}
+.hempty{text-align:center;padding:60px 20px;color:var(--tx3);font-size:13px;grid-column:1/-1;}
 
-/* HISTORY */
-#hist-screen{display:none;flex-direction:column;height:100%;overflow:hidden;}
-#hist-screen.active{display:flex;}
-.hist-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px;}
-.hist-item{border-radius:10px;overflow:hidden;border:1px solid var(--bd);position:relative;aspect-ratio:1;cursor:pointer;background:var(--s2);}
-.hist-item img{width:100%;height:100%;object-fit:cover;display:block;}
-.hist-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:28px;}
-.hist-label{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.8));padding:8px 6px 4px;font-size:9px;color:rgba(255,255,255,.6);font-family:'DM Mono',monospace;}
-.hist-empty{text-align:center;padding:60px 20px;color:var(--tx3);font-size:13px;}
+/* Modal */
+#mo{position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:flex-end;justify-content:center;z-index:200;backdrop-filter:blur(10px);}
+#mo.hidden{display:none;}
+#md{background:var(--s1);border:1px solid var(--bd2);border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:22px 18px 32px;}
+.mdh{width:36px;height:4px;background:var(--bd2);border-radius:2px;margin:0 auto 18px;}
+.mdt{font-family:'Syne',sans-serif;font-weight:700;font-size:17px;margin-bottom:4px;}
+.mds{color:var(--tx2);font-size:13px;margin-bottom:16px;line-height:1.5;}
+.mds a{color:var(--c);}
+.mdi{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--bd2);border-radius:10px;color:var(--tx);font-size:14px;padding:12px 13px;outline:none;font-family:'DM Mono',monospace;margin-bottom:14px;}
+.mdi:focus{border-color:rgba(34,211,238,.4);}
+.mdbtns{display:flex;gap:8px;}
+.mdbtn{flex:1;border-radius:10px;padding:13px;cursor:pointer;font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;transition:all .15s;}
+.mdbtn.c{background:rgba(255,255,255,.04);color:var(--tx2);border:1px solid var(--bd);}
+.mdbtn.ok{background:linear-gradient(135deg,var(--c),#6366f1);color:#fff;border:none;}
+.mdbtn.ok:disabled{opacity:.4;}
+.mddel{width:100%;margin-top:10px;background:rgba(248,113,113,.07);border:1px solid rgba(248,113,113,.2);border-radius:10px;color:var(--r);padding:12px;cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;}
 
-/* MODAL */
-#modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:flex-end;justify-content:center;z-index:200;backdrop-filter:blur(10px);}
-#modal-overlay.hidden{display:none;}
-#modal{background:var(--s1);border:1px solid var(--bd2);border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:24px 20px 32px;}
-.modal-handle{width:36px;height:4px;background:var(--bd2);border-radius:2px;margin:0 auto 20px;}
-.modal-title{font-family:'Syne',sans-serif;font-weight:700;font-size:17px;margin-bottom:5px;}
-.modal-sub{color:var(--tx2);font-size:13px;margin-bottom:18px;line-height:1.5;}
-.modal-sub a{color:var(--c);}
-.modal-input{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--bd2);border-radius:10px;color:var(--tx);font-size:14px;padding:12px 13px;outline:none;font-family:'DM Mono',monospace;margin-bottom:14px;}
-.modal-input:focus{border-color:rgba(34,211,238,.4);}
-.modal-btns{display:flex;gap:8px;}
-.modal-btn{flex:1;border-radius:10px;padding:13px;cursor:pointer;font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;border:1px solid var(--bd);transition:all .15s;}
-.modal-btn.cancel{background:rgba(255,255,255,.04);color:var(--tx2);}
-.modal-btn.confirm{background:linear-gradient(135deg,var(--c),#6366f1);color:#fff;border-color:transparent;}
-.modal-btn.confirm:disabled{opacity:.4;}
-.modal-del{width:100%;margin-top:10px;background:rgba(248,113,113,.07);border:1px solid rgba(248,113,113,.2);border-radius:10px;color:var(--r);padding:12px;cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;}
-
-/* SECTION COLORS */
-.sec-t2i{--a:var(--c)}
-.sec-edit{--a:var(--v)}
-.sec-i2v{--a:var(--p)}
-.sec-t2v{--a:var(--o)}
-.sec-vfx{--a:var(--g)}
-.sec-audio{--a:var(--y)}
-.sec-upscale{--a:var(--b)}
+/* Free badge */
+.free-pill{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.25);border-radius:4px;padding:1px 5px;font-size:9px;color:var(--g);font-family:'DM Mono',monospace;font-weight:700;}
 
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
 </style>
 </head>
 <body>
 
-<!-- TOP BAR -->
 <div id="topbar">
   <div id="logo">
     <div id="logo-icon">✦</div>
     <div id="logo-text">Open<span>Gen</span></div>
+    <div id="logo-free">FREE</div>
   </div>
   <div id="topbar-right">
-    <button class="top-btn" id="hist-top-btn" onclick="showHistFromTop()">◷ <span id="hist-count">0</span></button>
-    <button class="top-btn err" id="key-btn" onclick="openModal()">⚠ Key</button>
+    <button class="top-btn" id="hist-btn" onclick="toggleHist()">◷ <span id="hcount">0</span></button>
+    <button class="top-btn err" id="key-btn" onclick="openModal()">⚠ HF Key</button>
   </div>
 </div>
 
-<!-- MAIN -->
 <div id="main">
 
 <!-- T2I -->
 <div class="screen active sec-t2i" id="screen-t2i">
-  <div class="scroll" id="scroll-t2i">
+  <div class="scroll">
     <div class="card">
-      <div class="card-label">Modelo <span id="t2i-count" style="color:var(--tx3)"></span></div>
-      <div class="model-scroll" id="models-t2i"></div>
+      <div class="lbl">Modelo — <span id="cnt-t2i"></span> disponibles <span class="free-pill">GRATIS</span></div>
+      <div class="mscroll" id="m-t2i"></div>
     </div>
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <div class="card-label" style="margin-bottom:0">Prompt</div>
-        <button class="ex-btn" onclick="fillEx('t2i')">ejemplo ↗</button>
+        <div class="lbl" style="margin-bottom:0">Prompt</div>
+        <button class="exbtn" onclick="fillEx('t2i')">ejemplo ↗</button>
       </div>
-      <textarea class="prompt-ta" id="prompt-t2i" placeholder="Describe la imagen que quieres generar..." oninput="onPI('t2i')"></textarea>
-      <div class="prompt-hint"><span id="pc-t2i">0/3000</span><span>⌘↵ generar</span></div>
+      <textarea class="pta" id="p-t2i" placeholder="Describe la imagen..." oninput="onPI('t2i')"></textarea>
+      <div class="phint"><span id="pc-t2i">0/1000</span><span>↵ generar</span></div>
+      <label class="neg-toggle"><input type="checkbox" id="neg-chk-t2i" onchange="toggleNeg('t2i')"> Negative prompt</label>
+      <textarea class="neg-ta" id="neg-t2i" placeholder="Lo que NO quieres ver..." style="display:none"></textarea>
     </div>
     <div class="card">
-      <div class="card-label">Aspect Ratio</div>
-      <div class="pill-row" id="ratio-t2i"></div>
+      <div class="lbl">Tamaño</div>
+      <div class="pr" id="size-t2i"></div>
+    </div>
+    <div class="card">
+      <div class="lbl">Pasos de inferencia</div>
+      <div class="pr" id="steps-t2i"></div>
+    </div>
+    <div class="gbwrap">
+      <button class="gbtn" id="gbtn-t2i" onclick="generate('t2i')" disabled>✦ Generar imagen</button>
     </div>
   </div>
-    <div class="gen-btn-wrap">
-      <button class="gen-btn" id="gen-btn-t2i" onclick="generate()" disabled>✦ Generar</button>
-    </div>
-
 </div>
 
 <!-- EDIT -->
-<div class="screen sec-edit" id="screen-edit">
-  <div class="scroll" id="scroll-edit">
+<div class="screen" id="screen-edit">
+  <div class="scroll">
     <div class="card">
-      <div class="card-label">Modelo <span id="edit-count" style="color:var(--tx3)"></span></div>
-      <div class="model-scroll" id="models-edit"></div>
+      <div class="lbl">Modelo — <span id="cnt-edit"></span> disponibles <span class="free-pill">GRATIS</span></div>
+      <div class="mscroll" id="m-edit"></div>
     </div>
-    <div class="card" id="edit-upload-card">
-      <div class="card-label">Imagen de entrada</div>
-      <div class="drop-zone" id="dz-edit" onclick="triggerUpload('edit')" ondragover="event.preventDefault()" ondrop="handleDrop(event,'edit')">
-        <div style="font-size:24px;opacity:.35;margin-bottom:6px">📁</div>
+    <div class="card">
+      <div class="lbl">Imagen de entrada</div>
+      <div class="dz" id="dz-edit" onclick="trigUp('edit')">
+        <div style="font-size:22px;opacity:.35;margin-bottom:6px">📁</div>
         <div style="font-size:12px;color:var(--tx3)">Toca para seleccionar</div>
-        <div style="font-size:10px;color:var(--tx3);margin-top:3px">JPG · PNG · WEBP</div>
       </div>
-      <div class="upload-preview" id="up-edit" style="display:none">
-        <img id="up-img-edit" src="" alt="">
-        <button class="upload-clear" onclick="clearUpload('edit')">✕</button>
+      <div class="uprev" id="up-edit" style="display:none">
+        <img id="uimg-edit" src="" alt="">
+        <button class="upclear" onclick="clrUp('edit')">✕</button>
       </div>
-      <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
-        <div style="flex:1;height:1px;background:var(--bd)"></div>
-        <span style="font-size:10px;color:var(--tx3)">O PEGA URL</span>
-        <div style="flex:1;height:1px;background:var(--bd)"></div>
-      </div>
-      <input class="url-input" id="url-edit" placeholder="https://ejemplo.com/imagen.jpg" style="margin-top:8px" oninput="onUrlInput('edit')">
+      <div class="divider"><div></div><span>O PEGA URL</span><div></div></div>
+      <input class="urlinput" id="url-edit" placeholder="https://..." oninput="onUrl('edit')">
     </div>
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <div class="card-label" style="margin-bottom:0">Prompt</div>
-        <button class="ex-btn" onclick="fillEx('edit')">ejemplo ↗</button>
+        <div class="lbl" style="margin-bottom:0">Instrucción de edición</div>
+        <button class="exbtn" onclick="fillEx('edit')">ejemplo ↗</button>
       </div>
-      <textarea class="prompt-ta" id="prompt-edit" placeholder="Describe cómo transformar la imagen..." oninput="onPI('edit')"></textarea>
-      <div class="prompt-hint"><span id="pc-edit">0/3000</span><span></span></div>
+      <textarea class="pta" id="p-edit" placeholder="Ej: Convierte al estilo Ghibli..." oninput="onPI('edit')"></textarea>
     </div>
-    <div class="card">
-      <div class="card-label">Aspect Ratio</div>
-      <div class="pill-row" id="ratio-edit"></div>
+    <div class="gbwrap">
+      <button class="gbtn" id="gbtn-edit" onclick="generate('edit')" disabled>✏ Editar imagen</button>
     </div>
   </div>
-    <div class="gen-btn-wrap">
-      <button class="gen-btn" id="gen-btn-edit" onclick="generate()" disabled>✏ Generar</button>
-    </div>
-
 </div>
 
 <!-- I2V -->
-<div class="screen sec-i2v" id="screen-i2v">
+<div class="screen" id="screen-i2v">
   <div class="scroll">
     <div class="card">
-      <div class="card-label">Modelo <span id="i2v-count" style="color:var(--tx3)"></span></div>
-      <div class="model-scroll" id="models-i2v"></div>
+      <div class="lbl">Modelo — <span id="cnt-i2v"></span> disponibles <span class="free-pill">GRATIS</span></div>
+      <div class="mscroll" id="m-i2v"></div>
     </div>
     <div class="card">
-      <div class="card-label">Imagen de entrada</div>
-      <div class="drop-zone" id="dz-i2v" onclick="triggerUpload('i2v')" ondragover="event.preventDefault()" ondrop="handleDrop(event,'i2v')">
-        <div style="font-size:24px;opacity:.35;margin-bottom:6px">📁</div>
+      <div class="lbl">Imagen de entrada</div>
+      <div class="dz" id="dz-i2v" onclick="trigUp('i2v')">
+        <div style="font-size:22px;opacity:.35;margin-bottom:6px">📁</div>
         <div style="font-size:12px;color:var(--tx3)">Toca para seleccionar</div>
       </div>
-      <div class="upload-preview" id="up-i2v" style="display:none">
-        <img id="up-img-i2v" src="" alt="">
-        <button class="upload-clear" onclick="clearUpload('i2v')">✕</button>
+      <div class="uprev" id="up-i2v" style="display:none">
+        <img id="uimg-i2v" src="" alt="">
+        <button class="upclear" onclick="clrUp('i2v')">✕</button>
       </div>
-      <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
-        <div style="flex:1;height:1px;background:var(--bd)"></div>
-        <span style="font-size:10px;color:var(--tx3)">O PEGA URL</span>
-        <div style="flex:1;height:1px;background:var(--bd)"></div>
-      </div>
-      <input class="url-input" id="url-i2v" placeholder="https://ejemplo.com/imagen.jpg" style="margin-top:8px" oninput="onUrlInput('i2v')">
+      <div class="divider"><div></div><span>O PEGA URL</span><div></div></div>
+      <input class="urlinput" id="url-i2v" placeholder="https://..." oninput="onUrl('i2v')">
     </div>
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <div class="card-label" style="margin-bottom:0">Prompt de movimiento</div>
-        <button class="ex-btn" onclick="fillEx('i2v')">ejemplo ↗</button>
+        <div class="lbl" style="margin-bottom:0">Prompt de movimiento</div>
+        <button class="exbtn" onclick="fillEx('i2v')">ejemplo ↗</button>
       </div>
-      <textarea class="prompt-ta" id="prompt-i2v" placeholder="Describe cómo debe moverse..." oninput="onPI('i2v')"></textarea>
+      <textarea class="pta" id="p-i2v" placeholder="Describe el movimiento..." oninput="onPI('i2v')"></textarea>
     </div>
-    <div class="card">
-      <div class="param-row" style="display:flex;gap:10px;margin-bottom:10px">
-        <div style="flex:1"><div class="card-label">Ratio</div><div class="pill-row" id="vratio-i2v"></div></div>
-        <div><div class="card-label">Duración</div><div class="pill-row" id="dur-i2v"></div></div>
-      </div>
-      <div class="card-label">Resolución</div>
-      <div class="pill-row" id="res-i2v"></div>
+    <div class="gbwrap">
+      <button class="gbtn" id="gbtn-i2v" onclick="generate('i2v')" disabled>▶ Generar video</button>
     </div>
   </div>
-    <div class="gen-btn-wrap">
-      <button class="gen-btn" id="gen-btn-i2v" onclick="generate()" disabled>▶ Generar</button>
-    </div>
-
 </div>
 
 <!-- T2V -->
-<div class="screen sec-t2v" id="screen-t2v">
+<div class="screen" id="screen-t2v">
   <div class="scroll">
     <div class="card">
-      <div class="card-label">Modelo <span id="t2v-count" style="color:var(--tx3)"></span></div>
-      <div class="model-scroll" id="models-t2v"></div>
+      <div class="lbl">Modelo — <span id="cnt-t2v"></span> disponibles <span class="free-pill">GRATIS</span></div>
+      <div class="mscroll" id="m-t2v"></div>
     </div>
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <div class="card-label" style="margin-bottom:0">Prompt</div>
-        <button class="ex-btn" onclick="fillEx('t2v')">ejemplo ↗</button>
+        <div class="lbl" style="margin-bottom:0">Prompt</div>
+        <button class="exbtn" onclick="fillEx('t2v')">ejemplo ↗</button>
       </div>
-      <textarea class="prompt-ta" id="prompt-t2v" placeholder="Describe el video que quieres generar..." oninput="onPI('t2v')"></textarea>
-      <div class="prompt-hint"><span id="pc-t2v">0/3000</span><span></span></div>
+      <textarea class="pta" id="p-t2v" placeholder="Describe el video..." oninput="onPI('t2v')"></textarea>
     </div>
-    <div class="card">
-      <div class="param-row" style="display:flex;gap:10px;margin-bottom:10px">
-        <div style="flex:1"><div class="card-label">Ratio</div><div class="pill-row" id="vratio-t2v"></div></div>
-        <div><div class="card-label">Duración</div><div class="pill-row" id="dur-t2v"></div></div>
-      </div>
-      <div class="card-label">Resolución</div>
-      <div class="pill-row" id="res-t2v"></div>
+    <div class="gbwrap">
+      <button class="gbtn" id="gbtn-t2v" onclick="generate('t2v')" disabled>🎬 Generar video</button>
     </div>
   </div>
-    <div class="gen-btn-wrap">
-      <button class="gen-btn" id="gen-btn-t2v" onclick="generate()" disabled>🎬 Generar</button>
-    </div>
-
 </div>
 
-<!-- VFX -->
-<div class="screen sec-vfx" id="screen-vfx">
+<!-- ENHANCE -->
+<div class="screen" id="screen-enhance">
   <div class="scroll">
     <div class="card">
-      <div class="card-label">Modelo <span id="vfx-count" style="color:var(--tx3)"></span></div>
-      <div class="model-scroll" id="models-vfx"></div>
+      <div class="lbl">Herramienta — <span id="cnt-enhance"></span> disponibles <span class="free-pill">GRATIS</span></div>
+      <div class="mscroll" id="m-enhance"></div>
     </div>
     <div class="card">
-      <div class="card-label">Imagen / Video de entrada</div>
-      <div class="drop-zone" id="dz-vfx" onclick="triggerUpload('vfx')" ondragover="event.preventDefault()" ondrop="handleDrop(event,'vfx')">
-        <div style="font-size:24px;opacity:.35;margin-bottom:6px">📁</div>
+      <div class="lbl">Imagen de entrada</div>
+      <div class="dz" id="dz-enhance" onclick="trigUp('enhance')">
+        <div style="font-size:22px;opacity:.35;margin-bottom:6px">📁</div>
         <div style="font-size:12px;color:var(--tx3)">Toca para seleccionar</div>
       </div>
-      <div class="upload-preview" id="up-vfx" style="display:none">
-        <img id="up-img-vfx" src="" alt="">
-        <button class="upload-clear" onclick="clearUpload('vfx')">✕</button>
+      <div class="uprev" id="up-enhance" style="display:none">
+        <img id="uimg-enhance" src="" alt="">
+        <button class="upclear" onclick="clrUp('enhance')">✕</button>
       </div>
-      <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
-        <div style="flex:1;height:1px;background:var(--bd)"></div>
-        <span style="font-size:10px;color:var(--tx3)">O PEGA URL</span>
-        <div style="flex:1;height:1px;background:var(--bd)"></div>
-      </div>
-      <input class="url-input" id="url-vfx" placeholder="https://ejemplo.com/imagen.jpg" style="margin-top:8px" oninput="onUrlInput('vfx')">
+      <div class="divider"><div></div><span>O PEGA URL</span><div></div></div>
+      <input class="urlinput" id="url-enhance" placeholder="https://..." oninput="onUrl('enhance')">
     </div>
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <div class="card-label" style="margin-bottom:0">Prompt de efecto</div>
-        <button class="ex-btn" onclick="fillEx('vfx')">ejemplo ↗</button>
-      </div>
-      <textarea class="prompt-ta" id="prompt-vfx" placeholder="Describe el efecto visual..." oninput="onPI('vfx')"></textarea>
+    <div class="card" id="enhance-prompt-card">
+      <div class="lbl">Prompt (opcional)</div>
+      <textarea class="pta" id="p-enhance" placeholder="Descripción adicional..." style="min-height:60px" oninput="onPI('enhance')"></textarea>
+    </div>
+    <div class="gbwrap">
+      <button class="gbtn" id="gbtn-enhance" onclick="generate('enhance')" disabled>⬆ Procesar imagen</button>
     </div>
   </div>
-    <div class="gen-btn-wrap">
-      <button class="gen-btn" id="gen-btn-vfx" onclick="generate()" disabled>✨ Generar</button>
-    </div>
-
 </div>
 
 <!-- AUDIO -->
-<div class="screen sec-audio" id="screen-audio">
+<div class="screen" id="screen-audio">
   <div class="scroll">
     <div class="card">
-      <div class="card-label">Modelo <span id="audio-count" style="color:var(--tx3)"></span></div>
-      <div class="model-scroll" id="models-audio"></div>
+      <div class="lbl">Modelo — <span id="cnt-audio"></span> disponibles <span class="free-pill">GRATIS</span></div>
+      <div class="mscroll" id="m-audio"></div>
     </div>
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <div class="card-label" style="margin-bottom:0">Prompt</div>
-        <button class="ex-btn" onclick="fillEx('audio')">ejemplo ↗</button>
+        <div class="lbl" style="margin-bottom:0">Prompt</div>
+        <button class="exbtn" onclick="fillEx('audio')">ejemplo ↗</button>
       </div>
-      <textarea class="prompt-ta" id="prompt-audio" placeholder="Describe la música o sonido..." oninput="onPI('audio')"></textarea>
-      <div class="prompt-hint"><span id="pc-audio">0/3000</span><span></span></div>
+      <textarea class="pta" id="p-audio" placeholder="Describe la música o sonido..." oninput="onPI('audio')"></textarea>
     </div>
-    <div class="card" id="audio-extra-card" style="display:none">
-      <div class="card-label" id="audio-extra-label">Parámetros adicionales</div>
-      <div id="audio-extra-fields"></div>
+    <div class="gbwrap">
+      <button class="gbtn" id="gbtn-audio" onclick="generate('audio')" disabled>🎵 Generar audio</button>
     </div>
   </div>
-    <div class="gen-btn-wrap">
-      <button class="gen-btn" id="gen-btn-audio" onclick="generate()" disabled>🎵 Generar</button>
-    </div>
-
 </div>
 
-<!-- UPSCALE -->
-<div class="screen sec-upscale" id="screen-upscale">
-  <div class="scroll">
-    <div class="card">
-      <div class="card-label">Modelo <span id="upscale-count" style="color:var(--tx3)"></span></div>
-      <div class="model-scroll" id="models-upscale"></div>
-    </div>
-    <div class="card">
-      <div class="card-label">Imagen de entrada</div>
-      <div class="drop-zone" id="dz-upscale" onclick="triggerUpload('upscale')" ondragover="event.preventDefault()" ondrop="handleDrop(event,'upscale')">
-        <div style="font-size:24px;opacity:.35;margin-bottom:6px">📁</div>
-        <div style="font-size:12px;color:var(--tx3)">Toca para seleccionar</div>
-      </div>
-      <div class="upload-preview" id="up-upscale" style="display:none">
-        <img id="up-img-upscale" src="" alt="">
-        <button class="upload-clear" onclick="clearUpload('upscale')">✕</button>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
-        <div style="flex:1;height:1px;background:var(--bd)"></div>
-        <span style="font-size:10px;color:var(--tx3)">O PEGA URL</span>
-        <div style="flex:1;height:1px;background:var(--bd)"></div>
-      </div>
-      <input class="url-input" id="url-upscale" placeholder="https://ejemplo.com/imagen.jpg" style="margin-top:8px" oninput="onUrlInput('upscale')">
-    </div>
-    <div class="card" id="upscale-params">
-      <div class="card-label">Escala</div>
-      <div class="pill-row" id="scale-pills"></div>
-    </div>
-  </div>
-    <div class="gen-btn-wrap">
-      <button class="gen-btn" id="gen-btn-upscale" onclick="generate()" disabled>⬆ Generar</button>
-    </div>
-
-</div>
-
-<!-- HISTORY SCREEN -->
-<div id="hist-screen">
-  <div class="scroll" id="hist-list-wrap" style="padding:0">
-    <div class="hist-grid" id="hist-grid"></div>
+<!-- HISTORY -->
+<div id="hs">
+  <div class="scroll" style="padding:0">
+    <div class="hgrid" id="hgrid"></div>
   </div>
 </div>
 
 </div><!-- /main -->
 
+<!-- FILE INPUTS -->
+<input id="fi-edit" type="file" accept="image/*" style="display:none" onchange="handleFile(event,'edit')">
+<input id="fi-i2v" type="file" accept="image/*" style="display:none" onchange="handleFile(event,'i2v')">
+<input id="fi-enhance" type="file" accept="image/*" style="display:none" onchange="handleFile(event,'enhance')">
 
 <!-- RESULT PANEL -->
-<div id="result-panel">
-  <div id="result-topbar">
-    <button id="back-btn" onclick="closeResult()">←</button>
-    <div id="result-title">Resultado</div>
-    <div style="margin-left:auto;font-size:10px;color:var(--tx3)" id="result-model-label"></div>
+<div id="rp">
+  <div id="rtop">
+    <button id="rbk" onclick="closeR()">←</button>
+    <div id="rtitle">Resultado</div>
+    <div id="rmodel"></div>
   </div>
-  <div id="result-scroll"></div>
+  <div id="rscroll"></div>
 </div>
 
-<!-- FILE INPUTS -->
-<input id="file-edit" type="file" accept="image/*" style="display:none" onchange="handleFileInput(event,'edit')">
-<input id="file-i2v" type="file" accept="image/*" style="display:none" onchange="handleFileInput(event,'i2v')">
-<input id="file-vfx" type="file" accept="image/*,video/*" style="display:none" onchange="handleFileInput(event,'vfx')">
-<input id="file-upscale" type="file" accept="image/*" style="display:none" onchange="handleFileInput(event,'upscale')">
+<!-- NAV -->
+<div id="nav">
+  <button class="nav-btn active" data-sec="t2i" onclick="go('t2i')"><span class="ni">✦</span>Imagen</button>
+  <button class="nav-btn" data-sec="edit" onclick="go('edit')"><span class="ni">✏️</span>Editar</button>
+  <button class="nav-btn" data-sec="i2v" onclick="go('i2v')"><span class="ni">▶️</span>Img→Vid</button>
+  <button class="nav-btn" data-sec="t2v" onclick="go('t2v')"><span class="ni">🎬</span>T2V</button>
+  <button class="nav-btn" data-sec="enhance" onclick="go('enhance')"><span class="ni">⬆️</span>Mejorar</button>
+  <button class="nav-btn" data-sec="audio" onclick="go('audio')"><span class="ni">🎵</span>Audio</button>
+</div>
 
 <!-- MODAL -->
-<div id="modal-overlay" class="hidden">
-  <div id="modal">
-    <div class="modal-handle"></div>
-    <div class="modal-title">API Key de MuAPI</div>
-    <div class="modal-sub">
-      <strong style="color:var(--g)">🆓 Gratis:</strong> Token de <a href="https://huggingface.co/settings/tokens" target="_blank" style="color:var(--g)">Hugging Face</a> (hf_...) para modelos FLUX, SDXL y más.<br><br>
-      <strong style="color:var(--c)">💳 Premium:</strong> Key de <a href="https://muapi.ai" target="_blank">muapi.ai</a> para video, audio y modelos avanzados.
+<div id="mo" class="hidden">
+  <div id="md">
+    <div class="mdh"></div>
+    <div class="mdt">Hugging Face Token</div>
+    <div class="mds">Gratis en <a href="https://huggingface.co/settings/tokens" target="_blank">huggingface.co/settings/tokens</a> — tipo <b>Read</b></div>
+    <input id="mdi" class="mdi" type="password" placeholder="hf_xxxxxxxxxxxxxxxxxxxx" oninput="document.getElementById('mdok').disabled=!this.value.trim()">
+    <div class="mdbtns">
+      <button class="mdbtn c" onclick="closeModal()">Cancelar</button>
+      <button class="mdbtn ok" id="mdok" onclick="saveKey()" disabled>Guardar</button>
     </div>
-    <input id="modal-input" class="modal-input" type="password" placeholder="mua_xxxxxxxxxxxx" autocomplete="off" oninput="document.getElementById('modal-confirm').disabled=!this.value.trim()">
-    <div class="modal-btns">
-      <button class="modal-btn cancel" onclick="closeModal()">Cancelar</button>
-      <button class="modal-btn confirm" id="modal-confirm" onclick="saveKey()" disabled>Guardar</button>
-    </div>
-    <button class="modal-del" id="modal-del" style="display:none" onclick="deleteKey()">Eliminar key guardada</button>
+    <button class="mddel" id="mddel" style="display:none" onclick="delKey()">Eliminar token guardado</button>
   </div>
-</div>
-
-<!-- BOTTOM NAV -->
-<div id="nav">
-  <button class="nav-btn active" data-sec="t2i" onclick="switchSec('t2i')">
-    <span class="nav-icon">✦</span>Imagen
-  </button>
-  <button class="nav-btn" data-sec="edit" onclick="switchSec('edit')">
-    <span class="nav-icon">✏️</span>Editar
-  </button>
-  <button class="nav-btn" data-sec="i2v" onclick="switchSec('i2v')">
-    <span class="nav-icon">▶️</span>Img→Vid
-  </button>
-  <button class="nav-btn" data-sec="t2v" onclick="switchSec('t2v')">
-    <span class="nav-icon">🎬</span>T2V
-  </button>
-  <button class="nav-btn" data-sec="vfx" onclick="switchSec('vfx')">
-    <span class="nav-icon">✨</span>VFX
-  </button>
-  <button class="nav-btn" data-sec="audio" onclick="switchSec('audio')">
-    <span class="nav-icon">🎵</span>Audio
-  </button>
-  <button class="nav-btn" data-sec="upscale" onclick="switchSec('upscale')">
-    <span class="nav-icon">⬆️</span>Escalar
-  </button>
 </div>
 
 <script>
-const PROXY = 'https://corsproxy.io/?url=';
-const API = 'https://api.muapi.ai/api/v1';
-const HF_API = 'https://api-inference.huggingface.co/models';
+const HF_API = 'https://api-inference.huggingface.co/models/';
+const HF_ROUTER = 'https://router.huggingface.co/hf-inference/models/';
 
-// HuggingFace free models by section
-const HF_MODELS = {
-  t2i: [
-    {id:'flux-schnell-hf',   name:'FLUX.1 Schnell', model:'black-forest-labs/FLUX.1-schnell', badge:'Free⚡',bc:'#22d3ee',desc:'Más rápido, gratis'},
-    {id:'flux-dev-hf',       name:'FLUX.1 Dev',     model:'black-forest-labs/FLUX.1-dev',     badge:'Free HQ',bc:'#60a5fa',desc:'Alta calidad, gratis'},
-    {id:'sdxl-hf',           name:'SDXL Base',      model:'stabilityai/stable-diffusion-xl-base-1.0', badge:'Free',bc:'#a78bfa',desc:'SDXL gratis'},
-    {id:'sdxl-turbo-hf',     name:'SDXL Turbo',     model:'stabilityai/sdxl-turbo',           badge:'Free⚡',bc:'#34d399',desc:'Ultra rápido'},
-    {id:'dreamshaper-hf',    name:'DreamShaper XL',  model:'Lykon/dreamshaper-xl-turbo',       badge:'Free',bc:'#f472b6',desc:'Artístico'},
-    {id:'realvis-hf',        name:'RealVisXL v4',    model:'SG161222/RealVisXL_V4.0',          badge:'Free',bc:'#fb923c',desc:'Fotorrealista'},
-    {id:'playground-hf',     name:'Playground v2.5', model:'playgroundai/playground-v2.5-1024px-aesthetic', badge:'Free',bc:'#8b5cf6',desc:'Estético'},
-    {id:'animagine-hf',      name:'Animagine XL 3',  model:'cagliostrolab/animagine-xl-3.0',   badge:'Free',bc:'#f43f5e',desc:'Anime'},
-    {id:'juggernaut-hf',     name:'Juggernaut XL',   model:'RunDiffusion/Juggernaut-XL-v9',    badge:'Free',bc:'#fbbf24',desc:'Fotorrealista'},
-    {id:'flux-merged-hf',    name:'FLUX Merged',     model:'enhanceaiteam/Flux-Uncensored-V2', badge:'Free',bc:'#14b8a6',desc:'Versátil'},
-  ],
-};
-
-// ── MODELS ───────────────────────────────────────────────────────────────────
+// ── MODELS ────────────────────────────────────────────────────────────────────
 const MODELS = {
-  t2i:[
-    // --- GRATIS (Hugging Face) ---
-    {id:'flux-schnell-hf',hf:true,name:'FLUX Schnell',badge:'🆓⚡',bc:'#22d3ee',desc:'Gratis · Rápido'},
-    {id:'flux-dev-hf',hf:true,name:'FLUX Dev',badge:'🆓 HQ',bc:'#60a5fa',desc:'Gratis · Alta calidad'},
-    {id:'sdxl-hf',hf:true,name:'SDXL Base',badge:'🆓',bc:'#a78bfa',desc:'Gratis · Clásico'},
-    {id:'sdxl-turbo-hf',hf:true,name:'SDXL Turbo',badge:'🆓⚡',bc:'#34d399',desc:'Gratis · Ultra rápido'},
-    {id:'dreamshaper-hf',hf:true,name:'DreamShaper XL',badge:'🆓',bc:'#f472b6',desc:'Gratis · Artístico'},
-    {id:'realvis-hf',hf:true,name:'RealVisXL v4',badge:'🆓',bc:'#fb923c',desc:'Gratis · Fotorrealista'},
-    {id:'playground-hf',hf:true,name:'Playground 2.5',badge:'🆓',bc:'#8b5cf6',desc:'Gratis · Estético'},
-    {id:'animagine-hf',hf:true,name:'Animagine XL',badge:'🆓',bc:'#f43f5e',desc:'Gratis · Anime'},
-    // --- MUAPI (requiere créditos) ---
-    {id:'flux-schnell',ep:'flux-schnell-image',name:'Flux Schnell',badge:'Fast',bc:'#22d3ee',desc:'Ultra-rápido'},
-    {id:'flux-dev',ep:'flux-dev-image',name:'Flux Dev',badge:'HQ',bc:'#60a5fa',desc:'Alta calidad'},
-    {id:'flux-kontext-pro-t2i',ep:'flux-kontext-pro',name:'Flux Kontext Pro',badge:'Pro',bc:'#a78bfa',desc:'Contexto'},
-    {id:'flux-kontext-max-t2i',ep:'flux-kontext-max',name:'Flux Kontext Max',badge:'Max',bc:'#c084fc',desc:'Máximo'},
-    {id:'midjourney-v7-t2i',ep:'midjourney-v7-text-to-image',name:'Midjourney v7',badge:'MJ',bc:'#f472b6',desc:'Artístico'},
-    {id:'google-imagen4',ep:'google-imagen4',name:'Imagen 4',badge:'Google',bc:'#34a8f5',desc:'DeepMind'},
-    {id:'google-imagen4-ultra',ep:'google-imagen4-ultra',name:'Imagen 4 Ultra',badge:'Ultra',bc:'#818cf8',desc:'Premium'},
-    {id:'gpt4o-t2i',ep:'gpt4o-text-to-image',name:'GPT-4o Image',badge:'GPT',bc:'#10b981',desc:'OpenAI'},
-    {id:'gpt-image-2',ep:'gpt-image-2-text-to-image',name:'GPT Image 2',badge:'GPT2',bc:'#10b981',desc:'OpenAI v2'},
-    {id:'ideogram-v3-t2i',ep:'ideogram-v3',name:'Ideogram v3',badge:'Text',bc:'#fb923c',desc:'Con texto'},
-    {id:'hidream-i1-full',ep:'hidream-i1-full',name:'HiDream i1',badge:'New',bc:'#34d399',desc:'HD'},
-    {id:'grok-imagine-t2i',ep:'grok-imagine-text-to-image',name:'Grok Imagine',badge:'xAI',bc:'#6366f1',desc:'Grok'},
-    {id:'nano-banana',ep:'nano-banana',name:'Nano Banana',badge:'Fast',bc:'#fbbf24',desc:'Ligero'},
-    {id:'nano-banana-pro',ep:'nano-banana-pro',name:'Nano Banana Pro',badge:'Pro',bc:'#f59e0b',desc:'Pro'},
-    {id:'nano-banana-2',ep:'nano-banana-2',name:'Nano Banana 2',badge:'New',bc:'#34d399',desc:'v2'},
-    {id:'seedream-5',ep:'seedream-5.0',name:'Seedream 5.0',badge:'New',bc:'#f43f5e',desc:'ByteDance'},
-    {id:'minimax-image-01',ep:'minimax-image-01',name:'Minimax Image',badge:'MM',bc:'#a78bfa',desc:'Minimax'},
-    {id:'ai-anime-generator',ep:'ai-anime-generator',name:'Anime Gen',badge:'Anime',bc:'#f472b6',desc:'Anime'},
-    {id:'bytedance-seedream-v4.5',ep:'bytedance-seedream-v4.5',name:'Seedream 4.5',badge:'BD',bc:'#f43f5e',desc:'ByteDance'},
-    {id:'qwen-t2i',ep:'qwen-text-to-image-2512',name:'Qwen Image',badge:'Qwen',bc:'#06b6d4',desc:'Alibaba'},
-    {id:'reve-image',ep:'reve-image',name:'Reve Image',badge:'Reve',bc:'#8b5cf6',desc:'Creativo'},
+  t2i: [
+    {id:'flux-schnell', hf:'black-forest-labs/FLUX.1-schnell', name:'Flux Schnell', badge:'⚡Fast', bc:'#22d3ee', desc:'Más rápido'},
+    {id:'flux-dev',     hf:'black-forest-labs/FLUX.1-dev',     name:'Flux Dev',     badge:'HQ',     bc:'#60a5fa', desc:'Alta calidad'},
+    {id:'sdxl',         hf:'stabilityai/stable-diffusion-xl-base-1.0', name:'SDXL', badge:'SD',    bc:'#a78bfa', desc:'Clásico'},
+    {id:'sd35-turbo',   hf:'stabilityai/stable-diffusion-3.5-large-turbo', name:'SD 3.5 Turbo', badge:'Fast', bc:'#fb923c', desc:'SD3 rápido'},
+    {id:'sd35-med',     hf:'stabilityai/stable-diffusion-3.5-medium', name:'SD 3.5 Med', badge:'SD3', bc:'#f472b6', desc:'SD3 balanced'},
+    {id:'kolors',       hf:'Kwai-Kolors/Kolors', name:'Kolors', badge:'Kwai', bc:'#34d399', desc:'Colorido'},
+    {id:'playground',   hf:'playgroundai/playground-v2.5-1024px-aesthetic', name:'Playground v2.5', badge:'Play', bc:'#fbbf24', desc:'Estético'},
+    {id:'proteus',      hf:'dataautogpt3/ProteusV0.4', name:'Proteus v0.4', badge:'Real', bc:'#f43f5e', desc:'Realista'},
+    {id:'animagine',    hf:'cagliostrolab/animagine-xl-3.1', name:'Animagine XL', badge:'Anime', bc:'#ec4899', desc:'Anime'},
+    {id:'dreamshaper',  hf:'Lykon/dreamshaper-xl-1-0', name:'DreamShaper XL', badge:'Dream', bc:'#8b5cf6', desc:'Creativo'},
+    {id:'juggernaut',   hf:'RunDiffusion/Juggernaut-XL-v9', name:'Juggernaut XL', badge:'Photo', bc:'#f59e0b', desc:'Fotorrealista'},
+    {id:'pixart',       hf:'PixArt-alpha/PixArt-Sigma-XL-2-1024-MS', name:'PixArt Sigma', badge:'PixArt', bc:'#06b6d4', desc:'Alta res'},
   ],
-  edit:[
-    {id:'flux-kontext-dev-i2i',ep:'flux-kontext-dev-i2i',name:'Flux Kontext Dev',badge:'Edit',bc:'#a78bfa',imgF:'images_list',desc:'Edición contextual'},
-    {id:'flux-kontext-pro-i2i',ep:'flux-kontext-pro-i2i',name:'Flux Kontext Pro',badge:'Pro',bc:'#c084fc',imgF:'images_list',desc:'Pro edición'},
-    {id:'flux-kontext-max-i2i',ep:'flux-kontext-max-i2i',name:'Flux Kontext Max',badge:'Max',bc:'#818cf8',imgF:'images_list',desc:'Max edición'},
-    {id:'flux-2-pro-edit',ep:'flux-2-pro-edit',name:'Flux 2 Pro Edit',badge:'F2',bc:'#60a5fa',imgF:'images_list',desc:'Flux 2'},
-    {id:'flux-2-dev-edit',ep:'flux-2-dev-edit',name:'Flux 2 Dev Edit',badge:'F2',bc:'#60a5fa',imgF:'images_list',desc:'Flux 2 dev'},
-    {id:'flux-2-flex-edit',ep:'flux-2-flex-edit',name:'Flux 2 Flex',badge:'F2',bc:'#60a5fa',imgF:'images_list',desc:'Flexible'},
-    {id:'gpt4o-edit',ep:'gpt4o-edit',name:'GPT-4o Edit',badge:'GPT',bc:'#10b981',imgF:'image_url',desc:'Instruccional'},
-    {id:'gpt4o-i2i',ep:'gpt4o-image-to-image',name:'GPT-4o I2I',badge:'GPT',bc:'#10b981',imgF:'images_list',desc:'Image2Image'},
-    {id:'gpt-image-2-edit',ep:'gpt-image-2-image-to-image',name:'GPT Image 2',badge:'GPT2',bc:'#10b981',imgF:'images_list',desc:'OpenAI v2'},
-    {id:'gpt-image-1.5-edit',ep:'gpt-image-1.5-edit',name:'GPT Image 1.5',badge:'GPT',bc:'#10b981',imgF:'images_list',desc:'v1.5'},
-    {id:'nano-banana-edit',ep:'nano-banana-edit',name:'Nano Banana Edit',badge:'Fast',bc:'#fbbf24',imgF:'images_list',desc:'Rápido'},
-    {id:'nano-banana-pro-edit',ep:'nano-banana-pro-edit',name:'Nano Banana Pro',badge:'Pro',bc:'#f59e0b',imgF:'images_list',desc:'Pro'},
-    {id:'nano-banana-2-edit',ep:'nano-banana-2-edit',name:'Nano Banana 2',badge:'New',bc:'#34d399',imgF:'images_list',desc:'v2'},
-    {id:'ai-background-remover',ep:'ai-background-remover',name:'Remove BG',badge:'Auto',bc:'#34d399',imgF:'image_url',desc:'Fondo automático'},
-    {id:'ai-object-eraser',ep:'ai-object-eraser',name:'Object Eraser',badge:'Erase',bc:'#fb923c',imgF:'image_url',desc:'Borra objetos'},
-    {id:'ai-image-extension',ep:'ai-image-extension',name:'Outpaint',badge:'Out',bc:'#f472b6',imgF:'image_url',desc:'Expande bordes'},
-    {id:'ai-image-face-swap',ep:'ai-image-face-swap',name:'Face Swap',badge:'Face',bc:'#f43f5e',imgF:'image_url',desc:'Intercambia caras'},
-    {id:'ai-dress-change',ep:'ai-dress-change',name:'Dress Change',badge:'Fashion',bc:'#ec4899',imgF:'model_image_url',desc:'Cambia ropa'},
-    {id:'ai-skin-enhancer',ep:'ai-skin-enhancer',name:'Skin Enhancer',badge:'Beauty',bc:'#f9a8d4',imgF:'image_url',desc:'Mejora piel'},
-    {id:'ai-color-photo',ep:'ai-color-photo',name:'Colorize',badge:'Color',bc:'#fbbf24',imgF:'image_url',desc:'Coloriza B&N'},
-    {id:'ai-ghibli-style',ep:'ai-ghibli-style',name:'Ghibli Style',badge:'Ghibli',bc:'#34d399',imgF:'image_url',desc:'Estilo Ghibli'},
-    {id:'bytedance-seededit-v3',ep:'bytedance-seededit-image',name:'SeedEdit v3',badge:'BD',bc:'#f43f5e',imgF:'image_url',desc:'ByteDance'},
-    {id:'bytedance-seedream-edit-v4',ep:'bytedance-seedream-edit-v4',name:'Seedream Edit v4',badge:'BD',bc:'#f43f5e',imgF:'images_list',desc:'BD v4'},
-    {id:'seedream-5-edit',ep:'seedream-5.0-edit',name:'Seedream 5 Edit',badge:'New',bc:'#34d399',imgF:'images_list',desc:'BD v5'},
-    {id:'qwen-image-edit',ep:'qwen-image-edit',name:'Qwen Edit',badge:'Qwen',bc:'#06b6d4',imgF:'image_url',desc:'Alibaba'},
-    {id:'qwen-image-edit-plus',ep:'qwen-image-edit-plus',name:'Qwen Edit Plus',badge:'Qwen+',bc:'#06b6d4',imgF:'images_list',desc:'Avanzado'},
-    {id:'reve-image-edit',ep:'reve-image-edit',name:'Reve Edit',badge:'Reve',bc:'#8b5cf6',imgF:'image_url',desc:'Creativo'},
-    {id:'midjourney-v7-i2i',ep:'midjourney-v7-image-to-image',name:'Midjourney I2I',badge:'MJ',bc:'#f472b6',imgF:'image_url',desc:'MJ artístico'},
-    {id:'midjourney-v7-style',ep:'midjourney-v7-style-reference',name:'MJ Style Ref',badge:'MJ',bc:'#f472b6',imgF:'image_url',desc:'Estilo ref'},
-    {id:'flux-pulid',ep:'flux-pulid',name:'Flux PuLID',badge:'Face',bc:'#f43f5e',imgF:'image_url',desc:'Identidad facial'},
-    {id:'ideogram-reframe',ep:'ideogram-v3-reframe',name:'Ideogram Reframe',badge:'Idea',bc:'#fb923c',imgF:'image_url',desc:'Reencuadre'},
-    {id:'image-effects',ep:'image-effects',name:'Image Effects',badge:'FX',bc:'#34d399',imgF:'image_url',desc:'Efectos'},
-    {id:'flux-kontext-effects',ep:'flux-kontext-effects',name:'Flux FX',badge:'FX',bc:'#22d3ee',imgF:'image_url',desc:'Efectos Flux'},
-    {id:'ai-product-shot',ep:'ai-product-shot',name:'Product Shot',badge:'Shop',bc:'#fb923c',imgF:'image_url',desc:'Foto producto'},
-    {id:'ai-product-photography',ep:'ai-product-photography',name:'Product Photo',badge:'Shop',bc:'#fb923c',imgF:'person_image_url',desc:'Fotografía'},
-    {id:'flux-redux',ep:'flux-redux',name:'Flux Redux',badge:'Flux',bc:'#22d3ee',imgF:'image_url',desc:'Redux'},
-    {id:'wan2.5-image-edit',ep:'wan2.5-image-edit',name:'Wan 2.5 Edit',badge:'Wan',bc:'#14b8a6',imgF:'images_list',desc:'Wan2.5'},
-    {id:'wan2.6-image-edit',ep:'wan2.6-image-edit',name:'Wan 2.6 Edit',badge:'Wan',bc:'#14b8a6',imgF:'images_list',desc:'Wan2.6'},
-    {id:'kling-o1-edit',ep:'kling-o1-edit-image',name:'Kling O1 Edit',badge:'Kling',bc:'#fbbf24',imgF:'images_list',desc:'Kling O1'},
-    {id:'grok-i2i',ep:'grok-imagine-image-to-image',name:'Grok I2I',badge:'xAI',bc:'#6366f1',imgF:'image_url',desc:'xAI'},
-    {id:'vidu-ref',ep:'vidu-q2-reference-to-image',name:'Vidu Reference',badge:'Vidu',bc:'#a78bfa',imgF:'images_list',desc:'Referencia'},
+  edit: [
+    {id:'ip2p',     hf:'timbrooks/instruct-pix2pix', name:'InstructPix2Pix', badge:'Edit', bc:'#a78bfa', desc:'Edición instruccional'},
+    {id:'sdxl-ref', hf:'stabilityai/stable-diffusion-xl-refiner-1.0', name:'SDXL Refiner', badge:'Refine', bc:'#60a5fa', desc:'Refinado SDXL'},
+    {id:'img2img',  hf:'runwayml/stable-diffusion-v1-5', name:'SD 1.5 Img2Img', badge:'I2I', bc:'#34d399', desc:'Img2Img clásico'},
   ],
-  i2v:[
-    {id:'kling-v3-pro-i2v',ep:'kling-v3.0-pro-image-to-video',name:'Kling v3.0 Pro',badge:'⭐Best',bc:'#fbbf24',imgF:'image_url',desc:'Mejor calidad'},
-    {id:'kling-v3-std-i2v',ep:'kling-v3.0-standard-image-to-video',name:'Kling v3.0 Std',badge:'New',bc:'#34d399',imgF:'image_url',desc:'Estándar'},
-    {id:'kling-v2.6-pro-i2v',ep:'kling-v2.6-pro-i2v',name:'Kling v2.6 Pro',badge:'Pro',bc:'#fb923c',imgF:'image_url',desc:'v2.6'},
-    {id:'kling-o1-i2v',ep:'kling-o1-image-to-video',name:'Kling O1',badge:'O1',bc:'#f59e0b',imgF:'image_url',desc:'Razonamiento'},
-    {id:'kling-v2.1-master-i2v',ep:'kling-v2.1-master-i2v',name:'Kling v2.1 Master',badge:'Master',bc:'#fb923c',imgF:'image_url',desc:'Master'},
-    {id:'veo3-i2v',ep:'veo3-image-to-video',name:'Veo 3',badge:'Google',bc:'#34a8f5',imgF:'images_list',desc:'Con audio'},
-    {id:'veo3.1-i2v',ep:'veo3.1-image-to-video',name:'Veo 3.1',badge:'New',bc:'#34d399',imgF:'image_url',desc:'Google'},
-    {id:'veo3.1-fast-i2v',ep:'veo3.1-fast-image-to-video',name:'Veo 3.1 Fast',badge:'Fast',bc:'#22d3ee',imgF:'image_url',desc:'Rápido'},
-    {id:'sora2-i2v',ep:'openai-sora-2-image-to-video',name:'Sora 2',badge:'OpenAI',bc:'#10b981',imgF:'images_list',desc:'OpenAI'},
-    {id:'sora2-pro-i2v',ep:'openai-sora-2-pro-image-to-video',name:'Sora 2 Pro',badge:'Pro',bc:'#10b981',imgF:'images_list',desc:'Pro'},
-    {id:'runway-i2v',ep:'runway-image-to-video',name:'Runway Gen-4',badge:'Cinema',bc:'#f59e0b',imgF:'image_url',desc:'Cinematográfico'},
-    {id:'runway-act2-i2v',ep:'runway-act-two-i2v',name:'Runway Act Two',badge:'Act2',bc:'#f59e0b',imgF:'image_url',desc:'Personajes'},
-    {id:'hailuo-2.3-pro',ep:'minimax-hailuo-2.3-pro-i2v',name:'Hailuo 2.3 Pro',badge:'New',bc:'#34d399',imgF:'image_url',desc:'Minimax'},
-    {id:'hailuo-02-pro',ep:'minimax-hailuo-02-pro-i2v',name:'Hailuo 02 Pro',badge:'Pro',bc:'#a78bfa',imgF:'image_url',desc:'Minimax'},
-    {id:'wan2.6-i2v',ep:'wan2.6-image-to-video',name:'Wan 2.6',badge:'New',bc:'#34d399',imgF:'image_url',desc:'Open source'},
-    {id:'wan2.5-i2v',ep:'wan2.5-image-to-video',name:'Wan 2.5',badge:'Wan',bc:'#14b8a6',imgF:'image_url',desc:'Open source'},
-    {id:'wan2.2-i2v',ep:'wan2.2-image-to-video',name:'Wan 2.2',badge:'Wan',bc:'#14b8a6',imgF:'image_url',desc:'Stable'},
-    {id:'seedance-pro-i2v',ep:'seedance-pro-i2v',name:'Seedance Pro',badge:'BD',bc:'#f43f5e',imgF:'image_url',desc:'Cinema'},
-    {id:'seedance-v2-i2v',ep:'seedance-v2.0-i2v',name:'Seedance v2',badge:'New',bc:'#34d399',imgF:'images_list',desc:'v2.0'},
-    {id:'hunyuan-i2v',ep:'hunyuan-image-to-video',name:'Hunyuan I2V',badge:'Tencent',bc:'#3b82f6',imgF:'image_url',desc:'Tencent'},
-    {id:'ltx-2-pro-i2v',ep:'ltx-2-pro-image-to-video',name:'LTX 2 Pro',badge:'LTX',bc:'#60a5fa',imgF:'image_url',desc:'Lightricks'},
-    {id:'ltx-2-19b-i2v',ep:'ltx-2-19b-image-to-video',name:'LTX 2 19B',badge:'Large',bc:'#6366f1',imgF:'image_url',desc:'19B params'},
-    {id:'pixverse-v5-i2v',ep:'pixverse-v5-i2v',name:'PixVerse v5',badge:'New',bc:'#34d399',imgF:'images_list',desc:'PixVerse'},
-    {id:'pixverse-v5.5-i2v',ep:'pixverse-v5.5-i2v',name:'PixVerse v5.5',badge:'New',bc:'#34d399',imgF:'images_list',desc:'v5.5'},
-    {id:'midjourney-v7-i2v',ep:'midjourney-v7-image-to-video',name:'MJ v7 I2V',badge:'MJ',bc:'#f472b6',imgF:'image_url',desc:'Artístico'},
-    {id:'grok-i2v',ep:'grok-imagine-image-to-video',name:'Grok I2V',badge:'xAI',bc:'#6366f1',imgF:'images_list',desc:'xAI'},
+  i2v: [
+    {id:'i2vgen',   hf:'ali-vilab/i2vgen-xl', name:'I2VGen-XL', badge:'Ali', bc:'#f472b6', desc:'Imagen a video'},
+    {id:'svd',      hf:'stabilityai/stable-video-diffusion-img2vid-xt-1-1', name:'SVD XT 1.1', badge:'SVD', bc:'#a78bfa', desc:'Stable Video'},
   ],
-  t2v:[
-    {id:'veo3-t2v',ep:'veo3-text-to-video',name:'Veo 3',badge:'Google',bc:'#34a8f5',desc:'Con audio nativo'},
-    {id:'veo3.1-t2v',ep:'veo3.1-text-to-video',name:'Veo 3.1',badge:'New',bc:'#34d399',desc:'Google nuevo'},
-    {id:'veo3.1-fast-t2v',ep:'veo3.1-fast-text-to-video',name:'Veo 3.1 Fast',badge:'Fast',bc:'#22d3ee',desc:'Rápido'},
-    {id:'kling-v3-pro-t2v',ep:'kling-v3.0-pro-text-to-video',name:'Kling v3.0 Pro',badge:'⭐Best',bc:'#fbbf24',desc:'Kling último'},
-    {id:'sora2-t2v',ep:'openai-sora-2-text-to-video',name:'Sora 2',badge:'OpenAI',bc:'#10b981',desc:'OpenAI'},
-    {id:'sora2-pro-t2v',ep:'openai-sora-2-pro-text-to-video',name:'Sora 2 Pro',badge:'Pro',bc:'#10b981',desc:'Pro'},
-    {id:'runway-t2v',ep:'runway-text-to-video',name:'Runway Gen-4',badge:'Cinema',bc:'#f59e0b',desc:'Cinematográfico'},
-    {id:'wan2.6-t2v',ep:'wan2.6-text-to-video',name:'Wan 2.6',badge:'New',bc:'#34d399',desc:'Open source'},
-    {id:'wan2.5-t2v',ep:'wan2.5-text-to-video',name:'Wan 2.5',badge:'Wan',bc:'#14b8a6',desc:'Open source'},
-    {id:'hunyuan-t2v',ep:'hunyuan-text-to-video',name:'Hunyuan T2V',badge:'Tencent',bc:'#3b82f6',desc:'Tencent'},
-    {id:'ltx-2-pro-t2v',ep:'ltx-2-pro-text-to-video',name:'LTX 2 Pro',badge:'LTX',bc:'#60a5fa',desc:'Lightricks'},
-    {id:'ltx-2-19b-t2v',ep:'ltx-2-19b-text-to-video',name:'LTX 2 19B',badge:'Large',bc:'#6366f1',desc:'19B params'},
-    {id:'seedance-pro-t2v',ep:'seedance-pro-text-to-video',name:'Seedance Pro',badge:'BD',bc:'#f43f5e',desc:'ByteDance'},
-    {id:'grok-t2v',ep:'grok-imagine-text-to-video',name:'Grok T2V',badge:'xAI',bc:'#6366f1',desc:'xAI'},
-    {id:'pixverse-v5-t2v',ep:'pixverse-v5-text-to-video',name:'PixVerse v5',badge:'New',bc:'#34d399',desc:'PixVerse'},
-    {id:'hailuo-2.3-t2v',ep:'minimax-hailuo-2.3-pro-text-to-video',name:'Hailuo 2.3',badge:'MM',bc:'#a78bfa',desc:'Minimax'},
-    {id:'kling-o1-t2v',ep:'kling-o1-text-to-video',name:'Kling O1',badge:'O1',bc:'#f59e0b',desc:'Razonamiento'},
+  t2v: [
+    {id:'t2v-ms',   hf:'damo-vilab/text-to-video-ms-1.7b', name:'Text2Video-Zero', badge:'Free', bc:'#fb923c', desc:'T2V gratuito'},
+    {id:'zeroscope',hf:'cerspense/zeroscope_v2_576w', name:'ZeroScope v2', badge:'Zero', bc:'#f43f5e', desc:'Rápido'},
   ],
-  vfx:[
-    {id:'ai-video-effects',ep:'generate_wan_ai_effects',name:'AI Video FX',badge:'WAN',bc:'#14b8a6',imgF:'image_url',desc:'Efectos WAN'},
-    {id:'motion-controls',ep:'generate_wan_ai_effects',name:'Motion Controls',badge:'Motion',bc:'#22d3ee',imgF:'image_url',desc:'Control movimiento'},
-    {id:'video-effects',ep:'video-effects',name:'Video Effects',badge:'FX',bc:'#f472b6',imgF:'image_url',desc:'Efectos video'},
-    {id:'kling-v3-pro-mc',ep:'kling-v3.0-pro-motion-control',name:'Kling v3 Motion',badge:'New',bc:'#34d399',imgF:'image_url',desc:'Control cámara'},
-    {id:'kling-v3-std-mc',ep:'kling-v3.0-std-motion-control',name:'Kling v3 Std MC',badge:'Std',bc:'#fbbf24',imgF:'image_url',desc:'Std motion'},
-    {id:'kling-v2.6-mc',ep:'kling-v2.6-std-motion-control',name:'Kling v2.6 MC',badge:'MC',bc:'#fb923c',imgF:'image_url',desc:'Motion ctrl'},
-    {id:'infinitetalk-i2v',ep:'infinitetalk-image-to-video',name:'InfiniteTalk',badge:'Talk',bc:'#34d399',imgF:'image_url',desc:'Habla en video'},
-    {id:'video-watermark',ep:'video-watermark-remover',name:'Remove Watermark',badge:'WM',bc:'#94a3b8',imgF:'image_url',desc:'Quita marca'},
+  enhance: [
+    {id:'upscale',  hf:'caidas/swin2SR-classical-sr-x2-64', name:'Swin2SR 2x', badge:'2x', bc:'#60a5fa', desc:'Upscale 2x'},
+    {id:'upscale4', hf:'caidas/swin2SR-realworld-sr-x4-64-bsrgan-psnr', name:'Swin2SR 4x', badge:'4x', bc:'#22d3ee', desc:'Upscale 4x'},
+    {id:'colorize', hf:'eimiss/EimisAnimeDiffusion_1.0v', name:'Colorize', badge:'Color', bc:'#fbbf24', desc:'Colorizar'},
+    {id:'depth',    hf:'depth-anything/Depth-Anything-V2-Small-hf', name:'Depth Map', badge:'Depth', bc:'#34d399', desc:'Mapa de profundidad'},
+    {id:'seg',      hf:'mattmdjaga/segformer_b2_clothes', name:'Segmentación', badge:'Seg', bc:'#f472b6', desc:'Segmentar ropa'},
   ],
-  audio:[
-    {id:'suno-create',ep:'suno-create-music',name:'Suno Create',badge:'Music',bc:'#f59e0b',desc:'Genera música completa'},
-    {id:'suno-extend',ep:'suno-extend-music',name:'Suno Extend',badge:'Extend',bc:'#fb923c',desc:'Extiende una canción'},
-    {id:'suno-remix',ep:'suno-remix-music',name:'Suno Remix',badge:'Remix',bc:'#f43f5e',desc:'Remixea canción'},
-    {id:'suno-sounds',ep:'suno-generate-sounds',name:'Suno Sounds',badge:'SFX',bc:'#fbbf24',desc:'Efectos de sonido'},
-    {id:'suno-vocals',ep:'suno-add-vocals',name:'Suno Vocals',badge:'Voz',bc:'#f472b6',desc:'Añade voz'},
-    {id:'suno-mashup',ep:'suno-generate-mashup',name:'Suno Mashup',badge:'Mix',bc:'#fb923c',desc:'Mashup'},
-    {id:'suno-instrumental',ep:'suno-add-instrumental',name:'Suno Instrumental',badge:'Inst',bc:'#fbbf24',desc:'Añade instrumental'},
-    {id:'suno-voice-clone',ep:'suno-voice-clone',name:'Suno Voice Clone',badge:'Clone',bc:'#ec4899',desc:'Clona voz Suno'},
-    {id:'mmaudio',ep:'mmaudio-v2/text-to-audio',name:'MMAudio v2',badge:'Audio',bc:'#fbbf24',desc:'Texto a audio'},
-    {id:'minimax-speech-hd',ep:'minimax-speech-2.6-hd',name:'Speech HD',badge:'TTS',bc:'#8b5cf6',desc:'Voz hiperrealista'},
-    {id:'minimax-speech-turbo',ep:'minimax-speech-2.6-turbo',name:'Speech Turbo',badge:'TTS',bc:'#8b5cf6',desc:'TTS rápido'},
-    {id:'minimax-voice-clone',ep:'minimax-voice-clone',name:'Voice Clone',badge:'Clone',bc:'#ec4899',desc:'Clona voz'},
-    {id:'sync-lipsync',ep:'sync-lipsync',name:'Sync Lipsync',badge:'Sync',bc:'#22d3ee',desc:'Sincroniza labios'},
-    {id:'creatify-lipsync',ep:'creatify-lipsync',name:'Creatify Lipsync',badge:'Lip',bc:'#f43f5e',desc:'Lipsync creativo'},
-    {id:'ltx-lipsync',ep:'ltx-2.3-lipsync',name:'LTX Lipsync',badge:'LTX',bc:'#60a5fa',desc:'Lipsync preciso'},
-    {id:'ltx-19b-lipsync',ep:'ltx-2-19b-lipsync',name:'LTX 19B Lip',badge:'Large',bc:'#6366f1',desc:'19B lipsync'},
-    {id:'veed-lipsync',ep:'veed-lipsync',name:'Veed Lipsync',badge:'Veed',bc:'#a78bfa',desc:'Veed'},
-    {id:'wan-s2v',ep:'wan2.2-speech-to-video',name:'Speech to Video',badge:'S2V',bc:'#06b6d4',desc:'Audio a video'},
-  ],
-  upscale:[
-    {id:'ai-upscaler',ep:'ai-image-upscale',name:'AI Upscaler',badge:'2-4x',bc:'#60a5fa',imgF:'image_url',desc:'Upscale genérico'},
-    {id:'topaz-upscale',ep:'topaz-image-upscale',name:'Topaz Upscale',badge:'Topaz',bc:'#22d3ee',imgF:'image_url',desc:'Pro calidad'},
-    {id:'seedvr2-upscale',ep:'seedvr2-image-upscale',name:'SeedVR2',badge:'BD',bc:'#f43f5e',imgF:'image_url',desc:'ByteDance'},
-    {id:'add-watermark',ep:'add-image-watermark',name:'Add Watermark',badge:'Mark',bc:'#94a3b8',imgF:'image_url',desc:'Marca de agua'},
+  audio: [
+    {id:'musicgen-sm',  hf:'facebook/musicgen-small',  name:'MusicGen Small',  badge:'Fast', bc:'#fbbf24', desc:'Música rápida'},
+    {id:'musicgen-med', hf:'facebook/musicgen-medium', name:'MusicGen Medium', badge:'Med',  bc:'#fb923c', desc:'Balanceado'},
+    {id:'musicgen-lg',  hf:'facebook/musicgen-large',  name:'MusicGen Large',  badge:'HQ',   bc:'#f43f5e', desc:'Alta calidad'},
+    {id:'audiogen',     hf:'facebook/audiogen-medium', name:'AudioGen',        badge:'SFX',  bc:'#34d399', desc:'Efectos de sonido'},
+    {id:'bark',         hf:'suno-ai/bark',              name:'Bark TTS',        badge:'TTS',  bc:'#a78bfa', desc:'Texto a voz'},
   ],
 };
 
 const EXAMPLES = {
-  t2i:['A lone astronaut drifting through a crystalline nebula, photorealistic, cinematic','Ancient Japanese temple at golden hour, cherry blossoms, misty mountains','Cyberpunk street market at night, neon reflections on wet asphalt, ultra-detailed'],
-  edit:['Remove the background, replace with sunset beach gradient','Transform to Studio Ghibli animation style','Make the subject look 20 years younger, natural lighting'],
-  i2v:['Camera slowly orbits the subject, soft cinematic bokeh, natural motion','Gentle wind blows through hair, smooth dolly zoom out','Dramatic slow-motion water splash, 120fps feel'],
-  t2v:['Timelapse of a city from dawn to midnight, aerial, 4K cinematic','Underwater coral reef, colorful fish, shafts of light','Wolf running through snowy forest, aerial tracking shot'],
-  vfx:['Add dramatic fire and ember particles around the subject','Apply teal and orange Hollywood color grade','Transform to slow-motion water explosion effect'],
-  audio:['Upbeat electronic music with synth leads and heavy bass, 120 BPM, festival energy','Calm ambient soundtrack with piano and soft strings, meditation feel','Short energetic jingle for a tech startup, modern, punchy'],
-  upscale:[''],
+  t2i:['A majestic lion in a golden savanna, photorealistic, dramatic lighting','Futuristic Tokyo street at night, neon signs, rain reflections, cinematic','Underwater world with bioluminescent creatures, dark ocean, magical'],
+  edit:['Convert to Studio Ghibli animation style','Add dramatic storm clouds to the background','Make it look like a vintage 1970s photograph'],
+  i2v:['Camera slowly zooms in, gentle motion blur','Subject turns to look at the camera naturally','Cinematic dolly shot moving forward slowly'],
+  t2v:['A timelapse of clouds moving over mountains at sunset','Ocean waves crashing on rocky shore, slow motion','Colorful fireworks exploding in night sky'],
+  enhance:[''],
+  audio:['Upbeat electronic dance music with heavy bass, 120 BPM','Calm piano melody for meditation, peaceful and slow','Epic orchestral battle theme, dramatic strings and brass'],
 };
 
-const SECS = ['t2i','edit','i2v','t2v','vfx','audio','upscale'];
-const SEC_COLORS = {t2i:'var(--c)',edit:'var(--v)',i2v:'var(--p)',t2v:'var(--o)',vfx:'var(--g)',audio:'var(--y)',upscale:'var(--b)'};
-const SEC_IS_VID = {i2v:true,t2v:true,vfx:true};
-const SEC_NEEDS_IMG = {edit:true,i2v:true,vfx:true,upscale:true};
+const SEC_COLORS = {t2i:'var(--c)',edit:'var(--v)',i2v:'var(--p)',t2v:'var(--o)',enhance:'var(--b)',audio:'var(--y)'};
+const SEC_NEEDS_IMG = {edit:true, i2v:true, enhance:true};
 
-// ── STATE ────────────────────────────────────────────────────────────────────
-let apiKey = '';
+const SIZES = ['512×512','768×768','1024×1024','1024×768','768×1024'];
+const STEPS_LIST = [10,20,28,35,50];
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let hfKey = localStorage.getItem('hf_key') || '';
 let curSec = 't2i';
 let selModel = {};
-let uploads = {};   // sec -> { dataUrl, name }
-let urlInputs = {}; // sec -> string
-let history = [];
+let uploads = {};
+let urlVals = {};
+let history = JSON.parse(localStorage.getItem('og_history') || '[]');
 let generating = false;
+let curSize = {};
+let curSteps = {t2i: 28};
 
-const ratios_img = ['1:1','16:9','9:16','4:3','3:4','21:9'];
-const ratios_vid = ['16:9','9:16','1:1','4:3','3:4'];
-const durations = [5,10];
-const resolutions = ['480p','720p','1080p'];
-const scales = ['2x','4x'];
-
-let curRatioImg = {t2i:'1:1',edit:'1:1'};
-let curRatioVid = {i2v:'16:9',t2v:'16:9'};
-let curDur = {i2v:5,t2v:5};
-let curRes = {i2v:'720p',t2v:'720p'};
-let curScale = '2x';
-
-// ── INIT ─────────────────────────────────────────────────────────────────────
+// ── INIT ──────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  SECS.forEach(s => buildModels(s));
-  buildRatioPills('t2i'); buildRatioPills('edit');
-  buildVidPills('i2v'); buildVidPills('t2v');
-  buildScalePills();
-  updateGenBtn();
-  document.getElementById('modal-input').addEventListener('keydown', e => { if(e.key==='Enter') saveKey(); });
+  Object.keys(MODELS).forEach(buildModels);
+  buildSizeSteps();
+  updateKeyBtn();
+  updateHCount();
+  Object.keys(MODELS).forEach(s => updateBtn(s));
+  document.getElementById('mdi').addEventListener('keydown', e => { if(e.key==='Enter') saveKey(); });
+  if (!hfKey) setTimeout(openModal, 600);
 });
 
 // ── SECTION ───────────────────────────────────────────────────────────────────
-function switchSec(sec) {
-  // Hide history if shown
-  const hs = document.getElementById('hist-screen');
-  hs.classList.remove('active');
-
+function go(sec) {
+  document.getElementById('hs').classList.remove('active');
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('screen-'+sec).classList.add('active');
   document.querySelector(`.nav-btn[data-sec="${sec}"]`).classList.add('active');
   curSec = sec;
-
-  // Update accent
-  document.documentElement.style.setProperty('--a', SEC_COLORS[sec]);
-  document.getElementById('logo-icon').style.background = `linear-gradient(135deg,${SEC_COLORS[sec]},#6366f1)`;
-  document.querySelector('#logo-text span').style.color = SEC_COLORS[sec].includes('var') ? '' : SEC_COLORS[sec];
-
-  updateGenBtn();
+  const c = SEC_COLORS[sec];
+  document.documentElement.style.setProperty('--a', c);
+  document.getElementById('logo-icon').style.background = `linear-gradient(135deg,${c},#6366f1)`;
 }
 
 // ── MODELS ────────────────────────────────────────────────────────────────────
 function buildModels(sec) {
-  const container = document.getElementById('models-'+sec);
-  if (!container) return;
-  const models = MODELS[sec] || [];
-  document.getElementById(sec+'-count').textContent = `— ${models.length}`;
-  if (!selModel[sec]) selModel[sec] = models[0]?.id;
-  container.innerHTML = '';
-  models.forEach(m => {
-    const chip = document.createElement('div');
-    chip.className = 'model-chip' + (m.id === selModel[sec] ? ' sel' : '');
-    chip.innerHTML = `<div class="mc-name">${m.name}</div><div class="mc-meta"><span class="mc-badge" style="background:${m.bc}18;color:${m.bc};border:1px solid ${m.bc}30">${m.badge}</span><span class="mc-desc">${m.desc}</span></div>`;
-    chip.onclick = () => {
+  const cont = document.getElementById('m-'+sec);
+  const cnt = document.getElementById('cnt-'+sec);
+  if (!cont) return;
+  const ms = MODELS[sec] || [];
+  if (cnt) cnt.textContent = ms.length;
+  if (!selModel[sec]) selModel[sec] = ms[0]?.id;
+  cont.innerHTML = '';
+  ms.forEach(m => {
+    const c = document.createElement('div');
+    c.className = 'mchip' + (m.id === selModel[sec] ? ' sel' : '');
+    c.innerHTML = `<div class="mn">${m.name}</div><div class="mm"><span class="mb" style="background:${m.bc}18;color:${m.bc};border:1px solid ${m.bc}30">${m.badge}</span><span class="md">${m.desc}</span></div>`;
+    c.onclick = () => {
       selModel[sec] = m.id;
-      container.querySelectorAll('.model-chip').forEach(c => c.classList.remove('sel'));
-      chip.classList.add('sel');
-      updateGenBtn();
+      cont.querySelectorAll('.mchip').forEach(x=>x.classList.remove('sel'));
+      c.classList.add('sel');
+      updateBtn(sec);
     };
-    container.appendChild(chip);
+    cont.appendChild(c);
   });
 }
 
-// ── PILLS ─────────────────────────────────────────────────────────────────────
-function buildRatioPills(sec) {
-  const el = document.getElementById('ratio-'+sec);
-  ratios_img.forEach(r => {
+function buildSizeSteps() {
+  const sc = document.getElementById('size-t2i');
+  curSize.t2i = '1024×1024';
+  SIZES.forEach(s => {
     const b = document.createElement('button');
-    b.className = 'pill' + (r === curRatioImg[sec] ? ' on' : '');
-    b.textContent = r;
-    b.onclick = () => { curRatioImg[sec] = r; el.querySelectorAll('.pill').forEach(x=>x.classList.remove('on')); b.classList.add('on'); };
-    el.appendChild(b);
-  });
-}
-
-function buildVidPills(sec) {
-  const vr = document.getElementById('vratio-'+sec);
-  ratios_vid.forEach(r => {
-    const b = document.createElement('button');
-    b.className = 'pill'+(r===curRatioVid[sec]?' on':'');
-    b.textContent = r;
-    b.onclick = () => { curRatioVid[sec]=r; vr.querySelectorAll('.pill').forEach(x=>x.classList.remove('on')); b.classList.add('on'); };
-    vr.appendChild(b);
-  });
-  const dp = document.getElementById('dur-'+sec);
-  durations.forEach(d => {
-    const b = document.createElement('button');
-    b.className = 'pill'+(d===curDur[sec]?' on':'');
-    b.textContent = d+'s';
-    b.onclick = () => { curDur[sec]=d; dp.querySelectorAll('.pill').forEach(x=>x.classList.remove('on')); b.classList.add('on'); };
-    dp.appendChild(b);
-  });
-  const rp = document.getElementById('res-'+sec);
-  resolutions.forEach(r => {
-    const b = document.createElement('button');
-    b.className = 'pill'+(r===curRes[sec]?' on':'');
-    b.textContent = r;
-    b.onclick = () => { curRes[sec]=r; rp.querySelectorAll('.pill').forEach(x=>x.classList.remove('on')); b.classList.add('on'); };
-    rp.appendChild(b);
-  });
-}
-
-function buildScalePills() {
-  const el = document.getElementById('scale-pills');
-  scales.forEach(s => {
-    const b = document.createElement('button');
-    b.className = 'pill'+(s===curScale?' on':'');
+    b.className = 'pill' + (s === curSize.t2i ? ' on' : '');
     b.textContent = s;
-    b.onclick = () => { curScale=s; el.querySelectorAll('.pill').forEach(x=>x.classList.remove('on')); b.classList.add('on'); };
-    el.appendChild(b);
+    b.onclick = () => { curSize.t2i=s; sc.querySelectorAll('.pill').forEach(x=>x.classList.remove('on')); b.classList.add('on'); };
+    sc.appendChild(b);
+  });
+  const st = document.getElementById('steps-t2i');
+  STEPS_LIST.forEach(n => {
+    const b = document.createElement('button');
+    b.className = 'pill' + (n === curSteps.t2i ? ' on' : '');
+    b.textContent = n;
+    b.onclick = () => { curSteps.t2i=n; st.querySelectorAll('.pill').forEach(x=>x.classList.remove('on')); b.classList.add('on'); };
+    st.appendChild(b);
   });
 }
 
 // ── PROMPT ────────────────────────────────────────────────────────────────────
 function onPI(sec) {
-  const v = document.getElementById('prompt-'+sec).value;
+  const v = document.getElementById('p-'+sec)?.value || '';
   const pc = document.getElementById('pc-'+sec);
-  if (pc) pc.textContent = v.length+'/3000';
-  updateGenBtn();
+  if (pc) pc.textContent = v.length+'/1000';
+  updateBtn(sec);
 }
 
 function fillEx(sec) {
-  const exs = EXAMPLES[sec] || [];
-  const ta = document.getElementById('prompt-'+sec);
-  if (ta) { ta.value = exs[Math.floor(Math.random()*exs.length)] || ''; onPI(sec); }
+  const ta = document.getElementById('p-'+sec);
+  if (!ta) return;
+  const exs = EXAMPLES[sec]||[];
+  ta.value = exs[Math.floor(Math.random()*exs.length)]||'';
+  onPI(sec);
 }
 
-// ── UPLOAD ─────────────────────────────────────────────────────────────────────
-function triggerUpload(sec) { document.getElementById('file-'+sec)?.click(); }
-
-function handleFileInput(e, sec) {
-  const file = e.target.files[0]; if (!file) return;
-  readFile(file, sec);
+function toggleNeg(sec) {
+  const chk = document.getElementById('neg-chk-'+sec);
+  const ta = document.getElementById('neg-'+sec);
+  if (ta) ta.style.display = chk.checked ? 'block' : 'none';
 }
 
-function handleDrop(e, sec) {
-  e.preventDefault();
-  const file = e.dataTransfer.files[0]; if (!file) return;
-  readFile(file, sec);
-}
-
-function readFile(file, sec) {
-  const reader = new FileReader();
-  reader.onload = ev => {
-    uploads[sec] = { dataUrl: ev.target.result, name: file.name };
-    urlInputs[sec] = '';
+// ── UPLOAD ────────────────────────────────────────────────────────────────────
+function trigUp(sec) { document.getElementById('fi-'+sec)?.click(); }
+function handleFile(e, sec) { const f=e.target.files[0]; if(f) readF(f,sec); }
+function handleDrop(e, sec) { e.preventDefault(); const f=e.dataTransfer.files[0]; if(f) readF(f,sec); }
+function readF(file, sec) {
+  const r = new FileReader();
+  r.onload = ev => {
+    uploads[sec] = ev.target.result;
+    urlVals[sec] = '';
     const ui = document.getElementById('url-'+sec);
     if (ui) ui.value = '';
     document.getElementById('dz-'+sec).style.display = 'none';
     const up = document.getElementById('up-'+sec);
     up.style.display = 'block';
-    document.getElementById('up-img-'+sec).src = ev.target.result;
-    updateGenBtn();
+    document.getElementById('uimg-'+sec).src = ev.target.result;
+    updateBtn(sec);
   };
-  reader.readAsDataURL(file);
+  r.readAsDataURL(file);
 }
-
-function clearUpload(sec) {
+function clrUp(sec) {
   uploads[sec] = null;
   document.getElementById('dz-'+sec).style.display = 'block';
   document.getElementById('up-'+sec).style.display = 'none';
-  const fi = document.getElementById('file-'+sec);
+  const fi = document.getElementById('fi-'+sec);
   if (fi) fi.value = '';
-  updateGenBtn();
+  updateBtn(sec);
 }
-
-function onUrlInput(sec) {
-  urlInputs[sec] = document.getElementById('url-'+sec).value.trim();
-  updateGenBtn();
+function onUrl(sec) {
+  urlVals[sec] = document.getElementById('url-'+sec).value.trim();
+  updateBtn(sec);
 }
-
-function getImageInput(sec) {
-  if (urlInputs[sec]) return { type: 'url', value: urlInputs[sec] };
-  if (uploads[sec]) return { type: 'dataUrl', value: uploads[sec].dataUrl };
+function getImg(sec) {
+  if (urlVals[sec]) return { type:'url', v: urlVals[sec] };
+  if (uploads[sec]) return { type:'data', v: uploads[sec] };
   return null;
 }
 
 // ── GEN BTN ───────────────────────────────────────────────────────────────────
-function updateGenBtn() {
-  const sec = curSec;
-  const color = SEC_COLORS[sec];
-  const prompt = (document.getElementById('prompt-'+sec)?.value || '').trim();
-  const hasPrompt = sec === 'upscale' || !!prompt;
-  const hasImg = !SEC_NEEDS_IMG[sec] || !!getImageInput(sec);
-  const icons = {t2i:'✦',edit:'✏',i2v:'▶',t2v:'🎬',vfx:'✨',audio:'🎵',upscale:'⬆'};
-  // Update all section gen buttons
-  document.querySelectorAll('.gen-btn').forEach(btn => {
-    btn.style.background = generating ? 'rgba(255,255,255,.08)' : `linear-gradient(135deg,${color},#6366f1)`;
-    btn.disabled = generating || !hasPrompt || !hasImg;
-    btn.textContent = generating ? 'Generando...' : `${icons[sec]} Generar`;
-  });
+function updateBtn(sec) {
+  const btn = document.getElementById('gbtn-'+sec);
+  if (!btn) return;
+  const c = SEC_COLORS[sec];
+  const prompt = (document.getElementById('p-'+sec)?.value||'').trim();
+  const hasP = sec === 'enhance' || !!prompt;
+  const hasImg = !SEC_NEEDS_IMG[sec] || !!getImg(sec);
+  btn.disabled = generating || !hasP || !hasImg;
+  btn.style.background = btn.disabled ? 'rgba(255,255,255,.07)' : `linear-gradient(135deg,${c},#6366f1)`;
 }
 
-// ── GENERATE ──────────────────────────────────────────────────────────────────
-async function generate() {
-  if (!apiKey) { openModal(); return; }
-  const sec = curSec;
-  const models = MODELS[sec] || [];
-  const model = models.find(m => m.id === (selModel[sec] || models[0]?.id)) || models[0];
+// ── GENERATE ─────────────────────────────────────────────────────────────────
+async function generate(sec) {
+  if (!hfKey) { openModal(); return; }
+  const ms = MODELS[sec]||[];
+  const model = ms.find(m=>m.id===(selModel[sec]||ms[0]?.id))||ms[0];
   if (!model) return;
 
-  generating = true; updateGenBtn();
-  showResult();
-  setLoading('Preparando...');
+  generating = true;
+  Object.keys(MODELS).forEach(s => updateBtn(s));
+  showR();
+  setLoading('Conectando con '+model.name+'...');
 
   try {
-    // Get image URL if needed
-    let imgUrl = null;
-    if (SEC_NEEDS_IMG[sec]) {
-      const inp = getImageInput(sec);
-      if (!inp) throw new Error('Se requiere una imagen');
-      if (inp.type === 'url') {
-        imgUrl = inp.value;
-      } else {
-        setLoadingTxt('Subiendo imagen...');
-        imgUrl = await uploadImage(inp.value);
-      }
+    const prompt = document.getElementById('p-'+sec)?.value.trim()||'';
+    const negPrompt = document.getElementById('neg-'+sec)?.value.trim()||'';
+
+    let resultBlob;
+
+    if (sec === 't2i') {
+      resultBlob = await hfT2I(model.hf, prompt, negPrompt);
+    } else if (sec === 'edit') {
+      const imgData = getImg(sec);
+      if (!imgData) throw new Error('Sube una imagen primero');
+      resultBlob = await hfEdit(model.hf, prompt, imgData);
+    } else if (sec === 'i2v') {
+      const imgData = getImg(sec);
+      if (!imgData) throw new Error('Sube una imagen primero');
+      resultBlob = await hfI2V(model.hf, prompt, imgData);
+    } else if (sec === 't2v') {
+      resultBlob = await hfT2V(model.hf, prompt);
+    } else if (sec === 'enhance') {
+      const imgData = getImg(sec);
+      if (!imgData) throw new Error('Sube una imagen primero');
+      resultBlob = await hfEnhance(model.hf, imgData, prompt);
+    } else if (sec === 'audio') {
+      resultBlob = await hfAudio(model.hf, prompt);
     }
 
-    // Build body
-    const prompt = document.getElementById('prompt-'+sec)?.value.trim() || '';
-    const body = {};
-    if (prompt) body.prompt = prompt;
-
-    if (imgUrl) {
-      const imgField = model.imgF || 'image_url';
-      if (imgField === 'images_list') body.images_list = [imgUrl];
-      else body[imgField] = imgUrl;
-    }
-
-    if (SEC_IS_VID[sec] && sec !== 'vfx') {
-      body.aspect_ratio = curRatioVid[sec] || '16:9';
-      body.duration = curDur[sec] || 5;
-      body.resolution = curRes[sec] || '720p';
-    } else if (!SEC_IS_VID[sec] && sec !== 'audio' && sec !== 'upscale') {
-      body.aspect_ratio = curRatioImg[sec] || '1:1';
-    }
-    if (sec === 'upscale') {
-      body.scale = curScale === '4x' ? 4 : 2;
-    }
-
-    setLoadingTxt('Enviando a '+model.name+'...');
-    setProgress(15);
-
-    // ── Hugging Face free path ────────────────────────────────────────────
-    if (model.hf) {
-      if (!apiKey) { closeResult(); openModal(); return; }
-      const hfModel = HF_MODELS.t2i.find(m => m.id === model.id);
-      if (!hfModel) throw new Error('Modelo HF no encontrado');
-      setLoadingTxt('Generando con '+model.name+' (gratis)...');
-      setProgress(20);
-
-      const hfUrl = `${HF_API}/${hfModel.model}`;
-      const hfBody = { inputs: prompt, parameters: { guidance_scale: 7.5 } };
-
-      // HF can return the image directly (blob) or a URL
-      let attempts = 0;
-      let imageBlob = null;
-      while (attempts < 20) {
-        attempts++;
-        setProgress(20 + attempts * 3);
-        const hfRes = await fetch(
-          `${PROXY}${encodeURIComponent(hfUrl)}`,
-          { method:'POST', headers:{'Authorization':'Bearer '+apiKey,'Content-Type':'application/json'}, body:JSON.stringify(hfBody) }
-        );
-        if (hfRes.status === 503) {
-          // Model loading
-          const errData = await hfRes.json().catch(()=>({}));
-          const wait = errData.estimated_time || 20;
-          setLoadingTxt(`Cargando modelo... ~${Math.round(wait)}s`);
-          await sleep(Math.min(wait * 1000, 15000));
-          continue;
-        }
-        if (!hfRes.ok) {
-          const t = await hfRes.text();
-          throw new Error(`HF Error ${hfRes.status}: ${t.slice(0,120)}`);
-        }
-        const contentType = hfRes.headers.get('content-type') || '';
-        if (contentType.includes('image')) {
-          imageBlob = await hfRes.blob();
-          break;
-        } else {
-          const data = await hfRes.json();
-          // Some models return URL
-          const url = data[0]?.url || data.url || data[0];
-          if (typeof url === 'string' && url.startsWith('http')) {
-            const item = {url, type:'image', model:model.name, sec, prompt, time:Date.now()};
-            setProgress(100);
-            showResultMedia(item);
-            addHistory(item);
-            generating = false; updateGenBtn();
-            return;
-          }
-          throw new Error('Respuesta inesperada de HF: '+JSON.stringify(data).slice(0,100));
-        }
-      }
-      if (!imageBlob) throw new Error('No se pudo generar la imagen');
-
-      // Convert blob to object URL
-      const objectUrl = URL.createObjectURL(imageBlob);
-      const item = {url:objectUrl, type:'image', model:model.name, sec, prompt, time:Date.now(), isBlob:true};
-      setProgress(100);
-      showResultMedia(item);
-      addHistory(item);
-      generating = false; updateGenBtn();
-      return;
-    }
-
-    // ── MuAPI paid path ───────────────────────────────────────────────────
-    const submitRes = await apiFetch(model.ep, 'POST', body);
-    if (!submitRes.ok) {
-      const t = await submitRes.text();
-      throw new Error(`Error ${submitRes.status}: ${t.slice(0,120)}`);
-    }
-    const submitData = await submitRes.json();
-    const reqId = submitData.request_id || submitData.id;
-    if (!reqId) throw new Error('No se recibió request_id');
-
-    setProgress(30);
-    setLoadingTxt('Procesando...');
-
-    let attempts = 0;
-    while (attempts < 90) {
-      await sleep(2500); attempts++;
-      setProgress(Math.min(92, 30 + attempts * 1.5));
-
-      const pollRes = await apiFetch(`predictions/${reqId}/result`, 'GET');
-      if (!pollRes.ok) continue;
-      const pd = await pollRes.json();
-
-      if (pd.status === 'completed' || pd.status === 'succeeded') {
-        const url = pd.url || pd.outputs?.[0] || pd.output?.[0];
-        if (!url) throw new Error('No URL en respuesta');
-        const type = sec === 'audio' ? 'audio' : (SEC_IS_VID[sec] ? 'video' : 'image');
-        const item = { url, type, model: model.name, sec, prompt, time: Date.now() };
-        setProgress(100);
-        showResultMedia(item);
-        addHistory(item);
-        break;
-      } else if (pd.status === 'failed' || pd.status === 'error') {
-        throw new Error(pd.error || 'La generación falló');
-      }
-    }
-    if (attempts >= 90) throw new Error('Tiempo agotado (3.5 min)');
-  } catch(err) {
-    showResultError(err.message);
+    const url = URL.createObjectURL(resultBlob);
+    const type = sec === 'audio' ? 'audio' : (sec === 'i2v' || sec === 't2v') ? 'video' : 'image';
+    const item = { url, blob: null, type, model: model.name, sec, prompt, time: Date.now() };
+    showRMedia(item);
+    addHist({ ...item, blobType: resultBlob.type });
+  } catch(e) {
+    showRErr(e.message);
   } finally {
-    generating = false; updateGenBtn();
+    generating = false;
+    Object.keys(MODELS).forEach(s => updateBtn(s));
   }
 }
 
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+// ── HF API CALLS ──────────────────────────────────────────────────────────────
+async function hfCall(modelHf, payload, isJson = true) {
+  setLoadTxt('Generando con '+modelHf.split('/')[1]+'...');
+  setProgress(20);
 
-async function apiFetch(endpoint, method, body) {
-  const url = `${PROXY}${encodeURIComponent(`${API}/${endpoint}`)}`;
-  const opts = {
-    method,
-    headers: { 'x-api-key': apiKey },
-  };
-  if (body) {
-    opts.headers['Content-Type'] = 'application/json';
-    opts.body = JSON.stringify(body);
-  }
-  return fetch(url, opts);
-}
+  // Try main API first, then router
+  const urls = [HF_API + modelHf, HF_ROUTER + modelHf];
 
-// ── IMAGE UPLOAD ──────────────────────────────────────────────────────────────
-async function uploadImage(dataUrl) {
-  const compressed = await compressImage(dataUrl, 1280, 0.88);
-  const blob = await fetch(compressed).then(r => r.blob());
-  const file = new File([blob], 'image.jpg', { type: 'image/jpeg' });
-  const fd = new FormData();
-  fd.append('file', file);
-  const res = await fetch(`${PROXY}${encodeURIComponent(`${API}/upload_file`)}`, {
-    method: 'POST',
-    headers: { 'x-api-key': apiKey },
-    body: fd
-  });
-  if (!res.ok) throw new Error(`Upload failed ${res.status}`);
-  const data = await res.json();
-  const url = data.url || data.file_url || data.data?.url;
-  if (!url) throw new Error('Upload no devolvió URL');
-  return url;
-}
+  for (const url of urls) {
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + hfKey,
+          ...(isJson ? {'Content-Type': 'application/json'} : {}),
+        },
+        body: isJson ? JSON.stringify(payload) : payload,
+      });
 
-async function compressImage(dataUrl, maxSize, quality) {
-  return new Promise(resolve => {
-    const img = new Image();
-    img.onload = () => {
-      let w = img.width, h = img.height;
-      if (w > maxSize || h > maxSize) {
-        if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
-        else { w = Math.round(w * maxSize / h); h = maxSize; }
+      // Model loading - wait and retry
+      if (res.status === 503) {
+        const d = await res.json();
+        const wait = Math.min((d.estimated_time || 20) * 1000, 60000);
+        setLoadTxt(`Modelo cargando... ~${Math.round(wait/1000)}s`);
+        setProgress(30);
+        await sleep(wait);
+        // Retry
+        const res2 = await fetch(url, {
+          method:'POST',
+          headers:{'Authorization':'Bearer '+hfKey,...(isJson?{'Content-Type':'application/json'}:{})},
+          body: isJson ? JSON.stringify(payload) : payload,
+        });
+        if (res2.ok) { setProgress(90); return await res2.blob(); }
+        throw new Error(`Error ${res2.status}: ${await res2.text().then(t=>t.slice(0,100))}`);
       }
-      const c = document.createElement('canvas');
-      c.width = w; c.height = h;
-      c.getContext('2d').drawImage(img, 0, 0, w, h);
-      resolve(c.toDataURL('image/jpeg', quality));
-    };
-    img.src = dataUrl;
+
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error(`Error ${res.status}: ${txt.slice(0,120)}`);
+      }
+      setProgress(90);
+      return await res.blob();
+    } catch(e) {
+      if (url === urls[urls.length-1]) throw e;
+    }
+  }
+}
+
+async function hfT2I(hf, prompt, negPrompt) {
+  const [w,h] = (curSize.t2i||'1024×1024').split('×').map(Number);
+  return hfCall(hf, {
+    inputs: prompt,
+    parameters: {
+      negative_prompt: negPrompt || undefined,
+      width: w, height: h,
+      num_inference_steps: curSteps.t2i || 28,
+      guidance_scale: 3.5,
+    }
   });
 }
 
-// ── RESULT PANEL ──────────────────────────────────────────────────────────────
-function showResult() {
-  document.getElementById('result-panel').classList.add('show');
+async function hfEdit(hf, prompt, imgData) {
+  const imgB64 = await toB64(imgData);
+  return hfCall(hf, {
+    inputs: prompt,
+    parameters: { image: imgB64 }
+  });
 }
 
-function closeResult() {
-  document.getElementById('result-panel').classList.remove('show');
+async function hfI2V(hf, prompt, imgData) {
+  const imgB64 = await toB64(imgData);
+  return hfCall(hf, {
+    inputs: imgB64,
+    parameters: { prompt, decode_chunk_size: 8 }
+  });
 }
 
-let progressVal = 0;
-function setProgress(pct) {
-  progressVal = pct;
-  const pb = document.getElementById('rpbar');
-  const pl = document.getElementById('rpct');
-  if (pb) { pb.style.width = pct + '%'; pb.style.background = `linear-gradient(90deg,${SEC_COLORS[curSec]},#6366f1)`; }
-  if (pl) pl.textContent = Math.round(pct) + '%' + (SEC_IS_VID[curSec] ? ' · Videos toman 1-3 min' : '');
+async function hfT2V(hf, prompt) {
+  return hfCall(hf, { inputs: prompt });
 }
 
-function setLoadingTxt(txt) {
-  const el = document.getElementById('rloading-txt');
-  if (el) el.textContent = txt;
+async function hfEnhance(hf, imgData, prompt) {
+  const imgB64 = await toB64(imgData);
+  return hfCall(hf, { inputs: imgB64, parameters: prompt ? { prompt } : {} });
 }
+
+async function hfAudio(hf, prompt) {
+  return hfCall(hf, {
+    inputs: prompt,
+    parameters: { max_new_tokens: 512 }
+  });
+}
+
+async function toB64(imgData) {
+  if (imgData.type === 'data') return imgData.v.split(',')[1];
+  // URL - fetch and convert
+  const r = await fetch(imgData.v);
+  const buf = await r.arrayBuffer();
+  return btoa(String.fromCharCode(...new Uint8Array(buf)));
+}
+
+function sleep(ms) { return new Promise(r=>setTimeout(r,ms)); }
+
+// ── RESULT ────────────────────────────────────────────────────────────────────
+function showR() { document.getElementById('rp').classList.add('show'); }
+function closeR() { document.getElementById('rp').classList.remove('show'); }
+
+let progVal = 0;
+function setProgress(p) {
+  progVal = p;
+  const pb = document.getElementById('lpb');
+  const pt = document.getElementById('lpct');
+  if (pb) { pb.style.width=p+'%'; pb.style.background=`linear-gradient(90deg,${SEC_COLORS[curSec]},#6366f1)`; }
+  if (pt) pt.textContent = p+'%';
+}
+function setLoadTxt(t) { const el=document.getElementById('ltxt'); if(el) el.textContent=t; }
 
 function setLoading(txt) {
-  const color = SEC_COLORS[curSec];
-  document.getElementById('result-scroll').innerHTML = `
-    <div class="loading-wrap">
-      <div class="spinner" style="border-top-color:${color}"></div>
-      <div class="loading-txt" id="rloading-txt">${txt || 'Procesando...'}</div>
-      <div class="pbar-wrap"><div id="rpbar" class="pbar" style="width:10%"></div></div>
-      <div class="loading-pct" id="rpct">10%</div>
+  const c = SEC_COLORS[curSec];
+  document.getElementById('rscroll').innerHTML = `
+    <div class="lwrap">
+      <div class="spin" style="border-top-color:${c}"></div>
+      <div class="ltxt" id="ltxt">${txt}</div>
+      <div class="lbarw"><div id="lpb" class="lbar" style="width:10%;background:${c}"></div></div>
+      <div class="lpct" id="lpct">10%</div>
+      <div class="lhint">Si el modelo está frío puede tardar 1-2 min la primera vez</div>
     </div>`;
 }
 
-function showResultMedia(item) {
-  document.getElementById('result-model-label').textContent = item.model;
+function showRMedia(item) {
+  document.getElementById('rmodel').textContent = item.model;
   let media = '';
   if (item.type === 'video') {
-    media = `<video class="result-vid" src="${item.url}" controls autoplay loop playsinline></video>`;
+    media = `<video class="rvid" src="${item.url}" controls autoplay loop playsinline></video>`;
   } else if (item.type === 'audio') {
-    media = `<div class="result-audio-wrap"><div style="font-size:28px">🎵</div><audio src="${item.url}" controls style="flex:1"></audio></div>`;
+    media = `<div class="raudio"><div style="font-size:28px">🎵</div><audio src="${item.url}" controls style="flex:1"></audio></div>`;
   } else {
-    media = `<img class="result-img" src="${item.url}" alt="Generated" onclick="openFull('${item.url}')">`;
+    media = `<img class="rimg" src="${item.url}" alt="Generated" onclick="window.open('${item.url}','_blank')">`;
   }
-  document.getElementById('result-scroll').innerHTML = `
-    <div style="animation:fadeUp .3s ease">
+  document.getElementById('rscroll').innerHTML = `
+    <div style="animation:fadeUp .3s ease;display:flex;flex-direction:column;gap:10px">
       ${media}
-      <a href="${item.url}" target="_blank" download class="dl-btn">↓ Descargar ${item.type === 'video' ? 'video' : item.type === 'audio' ? 'audio' : 'imagen'}</a>
-      ${item.prompt ? `<div style="background:rgba(255,255,255,.03);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;font-size:12px;color:var(--tx3);line-height:1.5">"${item.prompt.slice(0,200)}"</div>` : ''}
+      <div class="rbtn-row">
+        <a href="${item.url}" download="opengenstudio.${item.type==='audio'?'mp3':item.type==='video'?'mp4':'png'}" class="rbtn">↓ Descargar</a>
+        <button class="rbtn" onclick="reusePrompt('${item.sec}','${encodeURIComponent(item.prompt||'')}')">↺ Reusar</button>
+      </div>
+      ${item.prompt ? `<div class="rprompt-card">"${item.prompt.slice(0,200)}"</div>` : ''}
     </div>`;
 }
 
-function showResultError(msg) {
-  document.getElementById('result-scroll').innerHTML = `
-    <div class="error-wrap">
-      <div class="error-icon">⚠️</div>
-      <div class="error-title">Error al generar</div>
-      <div class="error-msg">${msg}</div>
-      <button onclick="closeResult()" style="background:rgba(255,255,255,.06);border:1px solid var(--bd);border-radius:8px;color:var(--tx2);padding:10px 20px;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:8px">← Volver</button>
+function showRErr(msg) {
+  document.getElementById('rscroll').innerHTML = `
+    <div class="ewrap">
+      <div class="eicon">⚠️</div>
+      <div class="etitle">Error</div>
+      <div class="emsg">${msg}</div>
+      <button class="eback" onclick="closeR()">← Volver</button>
     </div>`;
 }
 
-function openFull(url) { window.open(url, '_blank'); }
+function reusePrompt(sec, encodedPrompt) {
+  const p = decodeURIComponent(encodedPrompt);
+  const ta = document.getElementById('p-'+sec);
+  if (ta) { ta.value = p; onPI(sec); }
+  closeR();
+  go(sec);
+}
 
 // ── HISTORY ───────────────────────────────────────────────────────────────────
-function addHistory(item) {
-  history.unshift(item);
-  document.getElementById('hist-count').textContent = history.length;
-  renderHistory();
+function addHist(item) {
+  const save = { ...item };
+  delete save.blob;
+  history.unshift(save);
+  if (history.length > 30) history = history.slice(0,30);
+  try { localStorage.setItem('og_history', JSON.stringify(history.map(h=>({...h,url:h.type==='image'?h.url:null})))); } catch(e){}
+  updateHCount();
+  renderHist();
 }
-
-function renderHistory() {
-  const grid = document.getElementById('hist-grid');
-  if (history.length === 0) {
-    grid.innerHTML = '<div class="hist-empty" style="grid-column:1/-1">Sin historial aún</div>';
-    return;
+function updateHCount() { document.getElementById('hcount').textContent = history.length; }
+function toggleHist() {
+  const hs = document.getElementById('hs');
+  if (hs.classList.contains('active')) {
+    hs.classList.remove('active');
+    go(curSec);
+  } else {
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+    hs.classList.add('active');
+    renderHist();
   }
-  grid.innerHTML = history.map((item, i) => {
-    const thumb = item.type === 'image'
-      ? `<img src="${item.url}" alt="" loading="lazy">`
-      : `<div class="hist-placeholder">${item.type === 'audio' ? '🎵' : '🎬'}</div>`;
-    return `<div class="hist-item" onclick="viewHistItem(${i})">${thumb}<div class="hist-label">${item.model}</div></div>`;
+}
+function renderHist() {
+  const g = document.getElementById('hgrid');
+  if (!history.length) { g.innerHTML='<div class="hempty">Sin historial aún</div>'; return; }
+  g.innerHTML = history.map((item,i) => {
+    const th = item.type==='image' && item.url ? `<img src="${item.url}" alt="" loading="lazy">` : `<div class="hph">${item.type==='audio'?'🎵':'🎬'}</div>`;
+    return `<div class="hitem" onclick="viewHist(${i})">${th}<div class="hlbl">${item.model||''}</div></div>`;
   }).join('');
 }
-
-function viewHistItem(i) {
-  showResult();
-  showResultMedia(history[i]);
-  document.getElementById('result-model-label').textContent = history[i].model;
-}
-
-function showHistFromTop() {
-  const hs = document.getElementById('hist-screen');
-  const isShowing = hs.classList.contains('active');
-  if (isShowing) {
-    hs.classList.remove('active');
-    switchSec(curSec);
-  } else {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-    hs.classList.add('active');
-    renderHistory();
-  }
+function viewHist(i) {
+  const item = history[i];
+  showR();
+  showRMedia(item);
 }
 
 // ── MODAL ─────────────────────────────────────────────────────────────────────
 function openModal() {
-  document.getElementById('modal-overlay').classList.remove('hidden');
-  document.getElementById('modal-input').value = '';
-  document.getElementById('modal-confirm').disabled = true;
-  document.getElementById('modal-del').style.display = apiKey ? 'block' : 'none';
-  setTimeout(() => document.getElementById('modal-input').focus(), 100);
+  document.getElementById('mo').classList.remove('hidden');
+  document.getElementById('mdi').value = '';
+  document.getElementById('mdok').disabled = true;
+  document.getElementById('mddel').style.display = hfKey ? 'block' : 'none';
+  setTimeout(()=>document.getElementById('mdi').focus(),100);
 }
-
-function closeModal() { document.getElementById('modal-overlay').classList.add('hidden'); }
-
+function closeModal() { document.getElementById('mo').classList.add('hidden'); }
 function saveKey() {
-  const v = document.getElementById('modal-input').value.trim();
+  const v = document.getElementById('mdi').value.trim();
   if (!v) return;
-  apiKey = v;
+  hfKey = v;
+  localStorage.setItem('hf_key', v);
+  updateKeyBtn();
+  closeModal();
+  Object.keys(MODELS).forEach(s=>updateBtn(s));
+}
+function delKey() {
+  hfKey = '';
+  localStorage.removeItem('hf_key');
+  updateKeyBtn();
+  closeModal();
+}
+function updateKeyBtn() {
   const btn = document.getElementById('key-btn');
-  const isHF = v.startsWith('hf_');
-  btn.textContent = isHF ? '🆓 HF' : '✓ Key';
-  btn.className = 'top-btn ok';
-  closeModal(); updateGenBtn();
+  if (hfKey) { btn.textContent='✓ HF Key'; btn.className='top-btn ok'; }
+  else { btn.textContent='⚠ HF Key'; btn.className='top-btn err'; }
 }
-
-function deleteKey() {
-  apiKey = '';
-  document.getElementById('key-btn').textContent = '⚠ Key';
-  document.getElementById('key-btn').className = 'top-btn err';
-  closeModal(); updateGenBtn();
-}
-
-document.getElementById('modal-overlay').addEventListener('click', e => {
-  if (e.target === document.getElementById('modal-overlay')) closeModal();
-});
+document.getElementById('mo').addEventListener('click', e=>{ if(e.target===document.getElementById('mo')) closeModal(); });
 </script>
 </body>
 </html>
