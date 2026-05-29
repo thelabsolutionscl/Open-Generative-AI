@@ -2,906 +2,928 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>OpenGen Studio — Free AI</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OpenGen Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#06070a;--s1:#0d0f14;--s2:#13151c;--bd:#1e2130;--bd2:#2a2e42;--tx:#e4e8f4;--tx2:#6b7494;--tx3:#323750;--c:#22d3ee;--v:#a78bfa;--p:#f472b6;--o:#fb923c;--g:#34d399;--y:#fbbf24;--b:#60a5fa;--r:#f87171;--a:var(--c);}
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;overflow:hidden;}
+:root{--bg:#06070a;--s1:#0d0f14;--s2:#13151c;--s3:#1a1d26;--bd:#1f2230;--bd2:#2a2e40;--tx:#e8ecf4;--tx2:#7a8099;--tx3:#3d4258;--accent:#22d3ee;--v:#a78bfa;--p:#f472b6;--o:#fb923c;--g:#34d399;--y:#fbbf24;--b:#60a5fa;--r:#f87171;}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;display:flex;flex-direction:column;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(34,211,238,.06),transparent),radial-gradient(ellipse 40% 40% at 90% 80%,rgba(167,139,250,.04),transparent);pointer-events:none;z-index:0;}
 
-#topbar{position:fixed;top:0;left:0;right:0;height:52px;background:rgba(6,7,10,.97);border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 14px;gap:10px;z-index:100;backdrop-filter:blur(20px);}
-#logo{display:flex;align-items:center;gap:7px;}
-#logo-icon{width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,var(--a),#6366f1);display:flex;align-items:center;justify-content:center;font-size:14px;transition:background .3s;}
-#logo-text{font-family:'Syne',sans-serif;font-weight:800;font-size:16px;letter-spacing:-.3px;}
-#logo-text span{color:var(--a);transition:color .3s;}
-#logo-free{font-size:9px;background:rgba(34,211,238,.12);border:1px solid rgba(34,211,238,.25);border-radius:4px;padding:2px 6px;color:var(--c);font-family:'DM Mono',monospace;}
-#topbar-right{margin-left:auto;display:flex;gap:6px;}
-.top-btn{background:rgba(255,255,255,.05);border:1px solid var(--bd);border-radius:7px;color:var(--tx2);font-family:'DM Sans',sans-serif;font-size:11px;padding:5px 10px;cursor:pointer;}
-.top-btn.ok{border-color:rgba(34,211,238,.3);color:var(--c);background:rgba(34,211,238,.07);}
-.top-btn.err{border-color:rgba(248,113,113,.3);color:var(--r);background:rgba(248,113,113,.07);}
+/* TOPBAR */
+#topbar{height:52px;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid var(--bd);position:relative;z-index:50;flex-shrink:0;gap:8px;background:rgba(6,7,10,.95);backdrop-filter:blur(20px);}
+#logo{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+#logo-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;background:linear-gradient(135deg,var(--accent),#6366f1);transition:background .3s;}
+#logo-text{font-family:'Syne',sans-serif;font-weight:800;font-size:16px;letter-spacing:-.5px;}
+#logo-text span{color:var(--accent);transition:color .3s;}
+#logo-badge{font-size:9px;background:rgba(255,255,255,.05);border:1px solid var(--bd);border-radius:4px;padding:2px 6px;color:var(--tx3);font-family:'DM Mono',monospace;letter-spacing:.5px;}
+#section-tabs{display:flex;gap:2px;flex:1;overflow-x:auto;scrollbar-width:none;}
+#section-tabs::-webkit-scrollbar{display:none;}
+.sec-tab{background:none;border:1px solid transparent;color:var(--tx3);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;padding:5px 10px;border-radius:7px;cursor:pointer;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:5px;letter-spacing:.2px;}
+.sec-tab:hover{color:var(--tx2);border-color:var(--bd2);}
+.sec-tab.active{border-color:var(--a,var(--accent));color:var(--a,var(--accent));background:color-mix(in srgb,var(--a,var(--accent)) 10%,transparent);}
+#topbar-right{display:flex;gap:6px;flex-shrink:0;}
+.top-btn{background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:7px;color:var(--tx2);font-family:'DM Sans',sans-serif;font-size:11px;padding:5px 10px;cursor:pointer;transition:all .15s;}
+.top-btn:hover{border-color:var(--bd2);color:var(--tx);}
+.top-btn.key-ok{border-color:rgba(34,211,238,.3);color:var(--accent);background:rgba(34,211,238,.06);}
+.top-btn.key-err{border-color:rgba(248,113,113,.3);color:var(--r);background:rgba(248,113,113,.06);}
+.top-btn.hist-on{border-color:var(--bd2);color:var(--tx);}
 
-#nav{position:fixed;bottom:0;left:0;right:0;height:58px;background:rgba(13,15,20,.97);border-top:1px solid var(--bd);display:flex;z-index:100;backdrop-filter:blur(20px);}
-.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;color:var(--tx3);font-family:'DM Sans',sans-serif;font-size:9px;font-weight:600;cursor:pointer;transition:color .15s;letter-spacing:.3px;text-transform:uppercase;padding:0;}
-.nav-btn .ni{font-size:17px;line-height:1;}
-.nav-btn.active{color:var(--a);}
+/* MAIN */
+#main{display:flex;flex:1;overflow:hidden;position:relative;z-index:1;}
 
-#main{position:fixed;top:52px;bottom:58px;left:0;right:0;overflow:hidden;}
-.screen{display:none;flex-direction:column;height:100%;overflow:hidden;}
-.screen.active{display:flex;}
-.scroll{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;-webkit-overflow-scrolling:touch;}
-.scroll::-webkit-scrollbar{display:none;}
+/* LEFT PANEL */
+#left{width:268px;flex-shrink:0;border-right:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden;background:rgba(13,15,20,.6);}
+#left-scroll{flex:1;overflow-y:auto;padding:14px 12px;display:flex;flex-direction:column;gap:13px;}
+#left-scroll::-webkit-scrollbar{width:3px;}
+#left-scroll::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:2px;}
+.sec-label{font-family:'DM Mono',monospace;font-size:9px;font-weight:500;color:var(--tx3);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px;}
+.left-footer{padding:12px;flex-shrink:0;border-top:1px solid var(--bd);}
 
-.card{background:rgba(255,255,255,.03);border:1px solid var(--bd);border-radius:12px;padding:12px;}
-.lbl{font-family:'DM Mono',monospace;font-size:9px;font-weight:500;color:var(--tx3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+/* upload zone */
+#upload-zone{border:1.5px dashed var(--bd2);border-radius:10px;padding:18px;text-align:center;cursor:pointer;transition:all .2s;}
+#upload-zone:hover,#upload-zone.drag{border-color:var(--a,var(--accent));background:color-mix(in srgb,var(--a,var(--accent)) 5%,transparent);}
+#upload-preview{position:relative;border-radius:10px;overflow:hidden;}
+#upload-preview img{width:100%;max-height:130px;object-fit:cover;display:block;border-radius:10px;}
+#upload-clear{position:absolute;top:5px;right:5px;background:rgba(0,0,0,.75);border:none;border-radius:5px;color:#fff;width:22px;height:22px;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;}
 
-/* Model chips */
-.mscroll{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;}
-.mscroll::-webkit-scrollbar{display:none;}
-.mchip{flex-shrink:0;background:rgba(255,255,255,.03);border:1px solid var(--bd);border-radius:9px;padding:8px 11px;cursor:pointer;transition:all .12s;min-width:100px;}
-.mchip.sel{background:color-mix(in srgb,var(--a) 12%,transparent);border-color:var(--a);}
-.mn{font-size:12px;font-weight:600;color:var(--tx2);white-space:nowrap;margin-bottom:3px;}
-.mchip.sel .mn{color:var(--a);}
-.mm{display:flex;align-items:center;gap:4px;}
-.mb{border-radius:3px;padding:1px 5px;font-size:9px;font-weight:700;font-family:'DM Mono',monospace;}
-.md{font-size:10px;color:var(--tx3);white-space:nowrap;}
+/* textarea */
+.prompt-wrap{position:relative;}
+.prompt-ta{width:100%;background:rgba(255,255,255,.035);border:1px solid var(--bd2);border-radius:10px;color:var(--tx);font-size:13px;font-family:'DM Sans',sans-serif;resize:none;outline:none;padding:11px 13px;transition:border-color .2s;min-height:82px;}
+.prompt-ta:focus{border-color:var(--a,var(--accent));}
+.prompt-hint{font-size:10px;color:var(--tx3);margin-top:4px;display:flex;justify-content:space-between;}
+.example-btn{background:none;border:none;color:var(--a,var(--accent));cursor:pointer;font-size:10px;font-family:'DM Sans',sans-serif;}
 
-/* Status indicator on chip */
-.mstatus{width:6px;height:6px;border-radius:50%;background:var(--tx3);flex-shrink:0;}
-.mstatus.free{background:var(--g);}
-.mstatus.loading{background:var(--y);animation:pulse 1s infinite;}
-.mstatus.error{background:var(--r);}
+/* params */
+.param-row{display:flex;gap:10px;}
+.param-group{flex:1;}
+.param-group-label{font-size:9px;color:var(--tx3);margin-bottom:5px;font-family:'DM Mono',monospace;letter-spacing:.5px;}
+.pill-row{display:flex;flex-wrap:wrap;gap:4px;}
+.pill{background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:5px;padding:4px 9px;cursor:pointer;font-size:10px;color:var(--tx3);transition:all .12s;font-family:'DM Mono',monospace;}
+.pill:hover{color:var(--tx2);border-color:var(--bd2);}
+.pill.on{color:var(--a,var(--accent));border-color:color-mix(in srgb,var(--a,var(--accent)) 50%,transparent);background:color-mix(in srgb,var(--a,var(--accent)) 10%,transparent);}
 
-/* Textarea */
-.pta{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--bd2);border-radius:10px;color:var(--tx);font-size:14px;font-family:'DM Sans',sans-serif;resize:none;outline:none;padding:11px 13px;transition:border-color .2s;min-height:85px;}
-.pta:focus{border-color:var(--a);}
-.phint{display:flex;justify-content:space-between;margin-top:4px;}
-.phint span{font-size:10px;color:var(--tx3);}
-.exbtn{background:none;border:none;color:var(--a);font-size:10px;cursor:pointer;font-family:'DM Sans',sans-serif;}
+/* gen button */
+#gen-btn{width:100%;border:none;border-radius:10px;color:#fff;font-size:14px;font-weight:700;padding:12px;cursor:pointer;transition:all .2s;font-family:'Syne',sans-serif;letter-spacing:.3px;position:relative;overflow:hidden;}
+#gen-btn:not(:disabled):hover{transform:translateY(-1px);filter:brightness(1.1);}
+#gen-btn:disabled{opacity:.35;cursor:not-allowed;transform:none;}
+#gen-btn::after{content:'';position:absolute;inset:0;background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.08),transparent 70%);transform:translateX(-100%);transition:transform .5s;}
+#gen-btn:not(:disabled):hover::after{transform:translateX(100%);}
 
-/* Pills */
-.pr{display:flex;flex-wrap:wrap;gap:5px;}
-.pill{background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:6px;padding:5px 10px;cursor:pointer;font-size:11px;color:var(--tx3);font-family:'DM Mono',monospace;transition:all .12s;}
-.pill.on{color:var(--a);border-color:color-mix(in srgb,var(--a) 50%,transparent);background:color-mix(in srgb,var(--a) 10%,transparent);}
+/* CENTER */
+#center{flex:1;display:flex;flex-direction:column;overflow:hidden;}
 
-/* Upload */
-.dz{border:1.5px dashed var(--bd2);border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:all .2s;}
-.dz:active{border-color:var(--a);background:color-mix(in srgb,var(--a) 5%,transparent);}
-.uprev{position:relative;border-radius:10px;overflow:hidden;}
-.uprev img{width:100%;max-height:180px;object-fit:cover;display:block;border-radius:10px;}
-.upclear{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.75);border:none;border-radius:5px;color:#fff;width:24px;height:24px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;}
-.urlinput{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--bd2);border-radius:8px;color:var(--tx);font-size:12px;font-family:'DM Mono',monospace;outline:none;padding:9px 11px;margin-top:8px;transition:border-color .2s;}
-.urlinput:focus{border-color:var(--a);}
-.divider{display:flex;align-items:center;gap:8px;margin-top:8px;}
-.divider span{font-size:10px;color:var(--tx3);}
-.divider div{flex:1;height:1px;background:var(--bd);}
+/* model strip */
+#model-strip-wrap{border-bottom:1px solid var(--bd);padding:10px 14px;flex-shrink:0;background:rgba(13,15,20,.4);}
+#model-strip-head{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+#model-count{font-family:'DM Mono',monospace;font-size:9px;color:var(--tx3);}
+#model-strip{display:flex;gap:6px;overflow-x:auto;padding-bottom:3px;}
+#model-strip::-webkit-scrollbar{height:2px;}
+#model-strip::-webkit-scrollbar-thumb{background:var(--bd2);}
+.model-chip{flex-shrink:0;background:rgba(255,255,255,.03);border:1px solid var(--bd);border-radius:8px;padding:7px 11px;cursor:pointer;transition:all .12s;}
+.model-chip:hover{border-color:var(--bd2);}
+.model-chip.selected{background:color-mix(in srgb,var(--a,var(--accent)) 10%,transparent);border-color:var(--a,var(--accent));}
+.chip-name{font-size:12px;font-weight:600;color:var(--tx2);margin-bottom:3px;white-space:nowrap;}
+.model-chip.selected .chip-name{color:var(--a,var(--accent));}
+.chip-meta{display:flex;align-items:center;gap:4px;}
+.chip-badge{border-radius:3px;padding:1px 5px;font-size:9px;font-weight:700;font-family:'DM Mono',monospace;}
+.chip-desc{font-size:10px;color:var(--tx3);white-space:nowrap;}
 
-/* Negative prompt toggle */
-.neg-toggle{display:flex;align-items:center;gap:6px;cursor:pointer;font-size:11px;color:var(--tx3);margin-top:6px;}
-.neg-toggle input{accent-color:var(--a);}
-.neg-ta{width:100%;background:rgba(255,255,255,.03);border:1px solid var(--bd);border-radius:8px;color:var(--tx2);font-size:12px;font-family:'DM Sans',sans-serif;resize:none;outline:none;padding:9px 11px;margin-top:6px;min-height:50px;transition:border-color .2s;}
-.neg-ta:focus{border-color:var(--a);}
+/* result */
+#result-area{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;}
+#result-area::-webkit-scrollbar{width:3px;}
+#result-area::-webkit-scrollbar-thumb{background:var(--bd2);}
 
-/* Gen button */
-.gbwrap{padding:0 0 10px;flex-shrink:0;}
-.gbtn{width:100%;height:50px;border:none;border-radius:14px;color:#fff;font-size:16px;font-weight:700;font-family:'Syne',sans-serif;cursor:pointer;transition:all .2s;letter-spacing:.3px;}
-.gbtn:disabled{opacity:.35;cursor:not-allowed;}
-.gbtn:not(:disabled):active{transform:scale(.98);}
+#progress-bar-wrap{height:2px;background:var(--bd);border-radius:1px;overflow:hidden;margin-bottom:12px;flex-shrink:0;}
+#progress-bar{height:100%;width:0%;border-radius:1px;transition:width .6s ease;}
 
-/* Result panel */
-#rp{position:fixed;top:52px;bottom:58px;left:0;right:0;background:var(--bg);z-index:50;display:none;flex-direction:column;}
-#rp.show{display:flex;}
-#rtop{display:flex;align-items:center;padding:10px 14px;border-bottom:1px solid var(--bd);gap:10px;flex-shrink:0;}
-#rbk{background:none;border:none;color:var(--tx2);font-size:22px;cursor:pointer;line-height:1;padding:0;}
-#rtitle{font-size:13px;font-weight:600;color:var(--tx2);}
-#rmodel{margin-left:auto;font-size:10px;color:var(--tx3);font-family:'DM Mono',monospace;}
-#rscroll{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;}
-#rscroll::-webkit-scrollbar{display:none;}
+.result-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:10;opacity:.2;}
+.result-empty-icon{font-size:60px;}
+.result-empty-text{font-size:13px;color:var(--tx3);}
 
-.rimg{width:100%;border-radius:12px;display:block;cursor:pointer;}
-.rvid{width:100%;border-radius:12px;display:block;background:#000;}
-.raudio{background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.15);border-radius:12px;padding:16px;display:flex;align-items:center;gap:12px;}
-.raudio audio{flex:1;}
-.rbtn-row{display:flex;gap:8px;}
-.rbtn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:rgba(255,255,255,.05);border:1px solid var(--bd);border-radius:10px;color:var(--tx2);padding:12px;font-size:13px;font-weight:600;text-decoration:none;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;}
-.rbtn:active{background:rgba(255,255,255,.08);}
-.rprompt-card{background:rgba(255,255,255,.025);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;font-size:12px;color:var(--tx3);line-height:1.5;font-style:italic;}
+.result-media{display:flex;flex-direction:column;gap:9px;animation:fadeUp .35s ease;flex:1;}
+.result-media img,.result-media video{width:100%;max-height:460px;object-fit:contain;border-radius:12px;background:#000;}
+.result-audio-wrap{background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.15);border-radius:12px;padding:18px;display:flex;align-items:center;gap:14px;}
+.result-dl{display:block;text-align:center;background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:8px;color:var(--tx2);padding:8px;font-size:12px;text-decoration:none;transition:all .15s;}
+.result-dl:hover{border-color:var(--bd2);color:var(--tx);}
+.result-error{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:10px;text-align:center;}
 
-/* Loading */
-.lwrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:40px;}
-.spin{width:50px;height:50px;border:3px solid rgba(255,255,255,.06);border-top-color:var(--a);border-radius:50%;animation:spin .9s linear infinite;}
-.ltxt{font-size:13px;color:var(--tx2);text-align:center;}
-.lpct{font-family:'DM Mono',monospace;font-size:11px;color:var(--tx3);}
-.lbarw{width:180px;height:2px;background:var(--bd);border-radius:1px;overflow:hidden;}
-.lbar{height:100%;border-radius:1px;transition:width .5s ease;}
-.lhint{font-size:10px;color:var(--tx3);text-align:center;max-width:240px;line-height:1.4;}
+.spinner{width:52px;height:52px;border:3px solid rgba(255,255,255,.05);border-top-color:var(--a,var(--accent));border-radius:50%;animation:spin .9s linear infinite;}
+.loading-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:14px;}
+.loading-pct{font-family:'DM Mono',monospace;font-size:12px;color:var(--tx3);}
+.loading-hint{font-size:11px;color:var(--tx3);}
+.loading-bar-wrap{width:180px;height:2px;background:var(--bd);border-radius:1px;overflow:hidden;}
+.loading-bar{height:100%;border-radius:1px;transition:width .6s ease;}
 
-/* Error */
-.ewrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:30px;text-align:center;}
-.eicon{font-size:38px;}
-.etitle{font-size:15px;font-weight:600;color:var(--r);}
-.emsg{font-size:12px;color:var(--tx3);line-height:1.6;max-width:280px;}
-.eback{background:rgba(255,255,255,.06);border:1px solid var(--bd);border-radius:8px;color:var(--tx2);padding:10px 20px;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:8px;font-size:13px;}
+/* RIGHT HISTORY */
+#hist-panel{width:190px;flex-shrink:0;border-left:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden;background:rgba(13,15,20,.4);}
+#hist-head{padding:11px 11px 8px;border-bottom:1px solid var(--bd);font-family:'DM Mono',monospace;font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:1px;flex-shrink:0;}
+#hist-list{flex:1;overflow-y:auto;padding:8px;}
+#hist-list::-webkit-scrollbar{width:3px;}
+#hist-list::-webkit-scrollbar-thumb{background:var(--bd2);}
+.hist-item{cursor:pointer;border-radius:8px;overflow:hidden;border:1px solid var(--bd);margin-bottom:7px;aspect-ratio:16/9;position:relative;background:var(--s2);transition:border-color .15s;}
+.hist-item:hover{border-color:var(--bd2);}
+.hist-item.selected{border-color:var(--a,var(--accent));}
+.hist-item img{width:100%;height:100%;object-fit:cover;display:block;}
+.hist-item-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:20px;}
+.hist-item-label{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.75));padding:6px 5px 3px;font-size:9px;color:rgba(255,255,255,.5);font-family:'DM Mono',monospace;}
+.hist-empty{font-size:11px;color:var(--tx3);text-align:center;padding:20px 0;}
 
-/* History */
-#hs{display:none;flex-direction:column;height:100%;overflow:hidden;}
-#hs.active{display:flex;}
-.hgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px;}
-.hitem{border-radius:10px;overflow:hidden;border:1px solid var(--bd);position:relative;aspect-ratio:1;cursor:pointer;background:var(--s2);}
-.hitem img{width:100%;height:100%;object-fit:cover;display:block;}
-.hph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:28px;}
-.hlbl{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.8));padding:8px 6px 4px;font-size:9px;color:rgba(255,255,255,.6);font-family:'DM Mono',monospace;}
-.hempty{text-align:center;padding:60px 20px;color:var(--tx3);font-size:13px;grid-column:1/-1;}
+/* MODAL */
+#modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(12px);}
+#modal-overlay.hidden{display:none;}
+#modal{background:var(--s1);border:1px solid var(--bd2);border-radius:16px;width:380px;padding:26px;animation:fadeUp .2s ease;}
+.modal-title{font-family:'Syne',sans-serif;font-weight:700;font-size:18px;margin-bottom:6px;}
+.modal-sub{color:var(--tx2);font-size:13px;margin-bottom:20px;line-height:1.5;}
+.modal-sub a{color:var(--accent);}
+.modal-input{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--bd2);border-radius:9px;color:var(--tx);font-size:13px;padding:11px 13px;outline:none;font-family:'DM Mono',monospace;transition:border-color .2s;margin-bottom:14px;}
+.modal-input:focus{border-color:rgba(34,211,238,.4);}
+.modal-btns{display:flex;gap:8px;}
+.modal-btn{flex:1;border-radius:9px;padding:11px;cursor:pointer;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;transition:all .15s;border:1px solid var(--bd);}
+.modal-btn.cancel{background:rgba(255,255,255,.04);color:var(--tx2);}
+.modal-btn.confirm{background:linear-gradient(135deg,var(--accent),#6366f1);color:#fff;border-color:transparent;}
+.modal-btn.confirm:disabled{opacity:.4;cursor:not-allowed;}
+.modal-btn-del{width:100%;margin-top:9px;background:rgba(248,113,113,.07);border:1px solid rgba(248,113,113,.2);border-radius:9px;color:var(--r);padding:9px;cursor:pointer;font-size:12px;font-family:'DM Sans',sans-serif;transition:all .15s;}
 
-/* Modal */
-#mo{position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:flex-end;justify-content:center;z-index:200;backdrop-filter:blur(10px);}
-#mo.hidden{display:none;}
-#md{background:var(--s1);border:1px solid var(--bd2);border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:22px 18px 32px;}
-.mdh{width:36px;height:4px;background:var(--bd2);border-radius:2px;margin:0 auto 18px;}
-.mdt{font-family:'Syne',sans-serif;font-weight:700;font-size:17px;margin-bottom:4px;}
-.mds{color:var(--tx2);font-size:13px;margin-bottom:16px;line-height:1.5;}
-.mds a{color:var(--c);}
-.mdi{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--bd2);border-radius:10px;color:var(--tx);font-size:14px;padding:12px 13px;outline:none;font-family:'DM Mono',monospace;margin-bottom:14px;}
-.mdi:focus{border-color:rgba(34,211,238,.4);}
-.mdbtns{display:flex;gap:8px;}
-.mdbtn{flex:1;border-radius:10px;padding:13px;cursor:pointer;font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;transition:all .15s;}
-.mdbtn.c{background:rgba(255,255,255,.04);color:var(--tx2);border:1px solid var(--bd);}
-.mdbtn.ok{background:linear-gradient(135deg,var(--c),#6366f1);color:#fff;border:none;}
-.mdbtn.ok:disabled{opacity:.4;}
-.mddel{width:100%;margin-top:10px;background:rgba(248,113,113,.07);border:1px solid rgba(248,113,113,.2);border-radius:10px;color:var(--r);padding:12px;cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;}
-
-/* Free badge */
-.free-pill{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.25);border-radius:4px;padding:1px 5px;font-size:9px;color:var(--g);font-family:'DM Mono',monospace;font-weight:700;}
-
+/* ANIM */
 @keyframes spin{to{transform:rotate(360deg)}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-@keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shimmer{from{background-position:-200px 0}to{background-position:200px 0}}
 </style>
 </head>
 <body>
 
+<!-- TOPBAR -->
 <div id="topbar">
   <div id="logo">
     <div id="logo-icon">✦</div>
     <div id="logo-text">Open<span>Gen</span></div>
-    <div id="logo-free">FREE</div>
+    <div id="logo-badge">STUDIO</div>
+  </div>
+  <div id="section-tabs">
+    <button class="sec-tab active" data-sec="t2i"   style="--a:var(--accent)">✦ Text → Image</button>
+    <button class="sec-tab"        data-sec="edit"  style="--a:var(--v)">✏ Edit Image</button>
+    <button class="sec-tab"        data-sec="i2v"   style="--a:var(--p)">▶ Image → Video</button>
+    <button class="sec-tab"        data-sec="t2v"   style="--a:var(--o)">🎬 Text → Video</button>
+    <button class="sec-tab"        data-sec="vfx"   style="--a:var(--g)">✨ VFX</button>
+    <button class="sec-tab"        data-sec="audio" style="--a:var(--y)">♪ Audio</button>
+    <button class="sec-tab"        data-sec="upscale" style="--a:var(--b)">⬆ Upscale</button>
   </div>
   <div id="topbar-right">
-    <button class="top-btn" id="hist-btn" onclick="toggleHist()">◷ <span id="hcount">0</span></button>
-    <button class="top-btn err" id="key-btn" onclick="openModal()">⚠ HF Key</button>
+    <button class="top-btn" id="hist-toggle-btn" onclick="toggleHistory()">◷ <span id="hist-count">0</span></button>
+    <button class="top-btn key-err" id="key-btn" onclick="openModal()">⚠ API Key</button>
   </div>
 </div>
 
+<!-- MAIN -->
 <div id="main">
 
-<!-- T2I -->
-<div class="screen active sec-t2i" id="screen-t2i">
-  <div class="scroll">
-    <div class="card">
-      <div class="lbl">Modelo — <span id="cnt-t2i"></span> disponibles <span class="free-pill">GRATIS</span></div>
-      <div class="mscroll" id="m-t2i"></div>
-    </div>
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <div class="lbl" style="margin-bottom:0">Prompt</div>
-        <button class="exbtn" onclick="fillEx('t2i')">ejemplo ↗</button>
-      </div>
-      <textarea class="pta" id="p-t2i" placeholder="Describe la imagen..." oninput="onPI('t2i')"></textarea>
-      <div class="phint"><span id="pc-t2i">0/1000</span><span>↵ generar</span></div>
-      <label class="neg-toggle"><input type="checkbox" id="neg-chk-t2i" onchange="toggleNeg('t2i')"> Negative prompt</label>
-      <textarea class="neg-ta" id="neg-t2i" placeholder="Lo que NO quieres ver..." style="display:none"></textarea>
-    </div>
-    <div class="card">
-      <div class="lbl">Tamaño</div>
-      <div class="pr" id="size-t2i"></div>
-    </div>
-    <div class="card">
-      <div class="lbl">Pasos de inferencia</div>
-      <div class="pr" id="steps-t2i"></div>
-    </div>
-    <div class="gbwrap">
-      <button class="gbtn" id="gbtn-t2i" onclick="generate('t2i')" disabled>✦ Generar imagen</button>
-    </div>
-  </div>
-</div>
+  <!-- LEFT -->
+  <div id="left">
+    <div id="left-scroll">
 
-<!-- EDIT -->
-<div class="screen" id="screen-edit">
-  <div class="scroll">
-    <div class="card">
-      <div class="lbl">Modelo — <span id="cnt-edit"></span> disponibles <span class="free-pill">GRATIS</span></div>
-      <div class="mscroll" id="m-edit"></div>
-    </div>
-    <div class="card">
-      <div class="lbl">Imagen de entrada</div>
-      <div class="dz" id="dz-edit" onclick="trigUp('edit')">
-        <div style="font-size:22px;opacity:.35;margin-bottom:6px">📁</div>
-        <div style="font-size:12px;color:var(--tx3)">Toca para seleccionar</div>
+      <!-- Upload zone (shown for edit/i2v/vfx/upscale) -->
+      <div id="upload-section" style="display:none">
+        <div class="sec-label">Imagen de entrada</div>
+        <div id="upload-zone" onclick="document.getElementById('file-input').click()"
+             ondragover="event.preventDefault();this.classList.add('drag')"
+             ondragleave="this.classList.remove('drag')"
+             ondrop="handleDrop(event)">
+          <div style="font-size:22px;opacity:.35;margin-bottom:6px">📁</div>
+          <div style="font-size:12px;color:var(--tx3)">Arrastra o haz clic</div>
+          <div style="font-size:10px;color:var(--tx3);margin-top:3px">JPG · PNG · WEBP</div>
+        </div>
+        <div id="upload-preview" style="display:none">
+          <img id="upload-img" src="" alt="">
+          <button id="upload-clear" onclick="clearUpload()">✕</button>
+        </div>
+        <input id="file-input" type="file" accept="image/*" style="display:none" onchange="handleFileInput(event)">
       </div>
-      <div class="uprev" id="up-edit" style="display:none">
-        <img id="uimg-edit" src="" alt="">
-        <button class="upclear" onclick="clrUp('edit')">✕</button>
+      <!-- URL input alternative -->
+      <div style="display:flex;align-items:center;gap:6px;margin-top:8px;">
+        <div style="flex:1;height:1px;background:var(--bd)"></div>
+        <span style="font-size:9px;color:var(--tx3);font-family:'DM Mono',monospace">O PEGA URL</span>
+        <div style="flex:1;height:1px;background:var(--bd)"></div>
       </div>
-      <div class="divider"><div></div><span>O PEGA URL</span><div></div></div>
-      <input class="urlinput" id="url-edit" placeholder="https://..." oninput="onUrl('edit')">
-    </div>
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <div class="lbl" style="margin-bottom:0">Instrucción de edición</div>
-        <button class="exbtn" onclick="fillEx('edit')">ejemplo ↗</button>
-      </div>
-      <textarea class="pta" id="p-edit" placeholder="Ej: Convierte al estilo Ghibli..." oninput="onPI('edit')"></textarea>
-    </div>
-    <div class="gbwrap">
-      <button class="gbtn" id="gbtn-edit" onclick="generate('edit')" disabled>✏ Editar imagen</button>
-    </div>
-  </div>
-</div>
+      <input id="url-input" type="url" placeholder="https://ejemplo.com/imagen.jpg"
+        style="width:100%;background:rgba(255,255,255,.04);border:1px solid var(--bd2);border-radius:8px;color:var(--tx);font-size:11px;padding:8px 10px;outline:none;margin-top:6px;font-family:'DM Mono',monospace;transition:border-color .2s;"
+        oninput="handleUrlInput(this.value)" />
 
-<!-- I2V -->
-<div class="screen" id="screen-i2v">
-  <div class="scroll">
-    <div class="card">
-      <div class="lbl">Modelo — <span id="cnt-i2v"></span> disponibles <span class="free-pill">GRATIS</span></div>
-      <div class="mscroll" id="m-i2v"></div>
-    </div>
-    <div class="card">
-      <div class="lbl">Imagen de entrada</div>
-      <div class="dz" id="dz-i2v" onclick="trigUp('i2v')">
-        <div style="font-size:22px;opacity:.35;margin-bottom:6px">📁</div>
-        <div style="font-size:12px;color:var(--tx3)">Toca para seleccionar</div>
+      <!-- Prompt -->
+      <div id="prompt-section">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+          <div class="sec-label" style="margin-bottom:0">Prompt</div>
+          <button class="example-btn" onclick="fillExample()">ejemplo ↗</button>
+        </div>
+        <div class="prompt-wrap">
+          <textarea id="prompt-ta" class="prompt-ta" placeholder="Describe lo que quieres generar..."></textarea>
+        </div>
+        <div class="prompt-hint">
+          <span id="prompt-count">0/3000</span>
+          <span>⌘↵ generar</span>
+        </div>
       </div>
-      <div class="uprev" id="up-i2v" style="display:none">
-        <img id="uimg-i2v" src="" alt="">
-        <button class="upclear" onclick="clrUp('i2v')">✕</button>
-      </div>
-      <div class="divider"><div></div><span>O PEGA URL</span><div></div></div>
-      <input class="urlinput" id="url-i2v" placeholder="https://..." oninput="onUrl('i2v')">
-    </div>
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <div class="lbl" style="margin-bottom:0">Prompt de movimiento</div>
-        <button class="exbtn" onclick="fillEx('i2v')">ejemplo ↗</button>
-      </div>
-      <textarea class="pta" id="p-i2v" placeholder="Describe el movimiento..." oninput="onPI('i2v')"></textarea>
-    </div>
-    <div class="gbwrap">
-      <button class="gbtn" id="gbtn-i2v" onclick="generate('i2v')" disabled>▶ Generar video</button>
-    </div>
-  </div>
-</div>
 
-<!-- T2V -->
-<div class="screen" id="screen-t2v">
-  <div class="scroll">
-    <div class="card">
-      <div class="lbl">Modelo — <span id="cnt-t2v"></span> disponibles <span class="free-pill">GRATIS</span></div>
-      <div class="mscroll" id="m-t2v"></div>
-    </div>
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <div class="lbl" style="margin-bottom:0">Prompt</div>
-        <button class="exbtn" onclick="fillEx('t2v')">ejemplo ↗</button>
-      </div>
-      <textarea class="pta" id="p-t2v" placeholder="Describe el video..." oninput="onPI('t2v')"></textarea>
-    </div>
-    <div class="gbwrap">
-      <button class="gbtn" id="gbtn-t2v" onclick="generate('t2v')" disabled>🎬 Generar video</button>
-    </div>
-  </div>
-</div>
+      <!-- Params -->
+      <div id="params-section">
+        <div class="sec-label">Parámetros</div>
 
-<!-- ENHANCE -->
-<div class="screen" id="screen-enhance">
-  <div class="scroll">
-    <div class="card">
-      <div class="lbl">Herramienta — <span id="cnt-enhance"></span> disponibles <span class="free-pill">GRATIS</span></div>
-      <div class="mscroll" id="m-enhance"></div>
-    </div>
-    <div class="card">
-      <div class="lbl">Imagen de entrada</div>
-      <div class="dz" id="dz-enhance" onclick="trigUp('enhance')">
-        <div style="font-size:22px;opacity:.35;margin-bottom:6px">📁</div>
-        <div style="font-size:12px;color:var(--tx3)">Toca para seleccionar</div>
-      </div>
-      <div class="uprev" id="up-enhance" style="display:none">
-        <img id="uimg-enhance" src="" alt="">
-        <button class="upclear" onclick="clrUp('enhance')">✕</button>
-      </div>
-      <div class="divider"><div></div><span>O PEGA URL</span><div></div></div>
-      <input class="urlinput" id="url-enhance" placeholder="https://..." oninput="onUrl('enhance')">
-    </div>
-    <div class="card" id="enhance-prompt-card">
-      <div class="lbl">Prompt (opcional)</div>
-      <textarea class="pta" id="p-enhance" placeholder="Descripción adicional..." style="min-height:60px" oninput="onPI('enhance')"></textarea>
-    </div>
-    <div class="gbwrap">
-      <button class="gbtn" id="gbtn-enhance" onclick="generate('enhance')" disabled>⬆ Procesar imagen</button>
-    </div>
-  </div>
-</div>
+        <!-- Image ratio (t2i, edit, upscale) -->
+        <div id="param-img-ratio">
+          <div class="param-group-label">Aspect Ratio</div>
+          <div class="pill-row" id="img-ratio-pills"></div>
+        </div>
 
-<!-- AUDIO -->
-<div class="screen" id="screen-audio">
-  <div class="scroll">
-    <div class="card">
-      <div class="lbl">Modelo — <span id="cnt-audio"></span> disponibles <span class="free-pill">GRATIS</span></div>
-      <div class="mscroll" id="m-audio"></div>
-    </div>
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <div class="lbl" style="margin-bottom:0">Prompt</div>
-        <button class="exbtn" onclick="fillEx('audio')">ejemplo ↗</button>
+        <!-- Video params -->
+        <div id="param-vid" style="display:none">
+          <div class="param-row" style="margin-bottom:10px">
+            <div class="param-group">
+              <div class="param-group-label">Ratio</div>
+              <div class="pill-row" id="vid-ratio-pills"></div>
+            </div>
+            <div class="param-group">
+              <div class="param-group-label">Duración</div>
+              <div class="pill-row" id="dur-pills"></div>
+            </div>
+          </div>
+          <div class="param-group">
+            <div class="param-group-label">Resolución</div>
+            <div class="pill-row" id="res-pills"></div>
+          </div>
+        </div>
       </div>
-      <textarea class="pta" id="p-audio" placeholder="Describe la música o sonido..." oninput="onPI('audio')"></textarea>
-    </div>
-    <div class="gbwrap">
-      <button class="gbtn" id="gbtn-audio" onclick="generate('audio')" disabled>🎵 Generar audio</button>
-    </div>
-  </div>
-</div>
 
-<!-- HISTORY -->
-<div id="hs">
-  <div class="scroll" style="padding:0">
-    <div class="hgrid" id="hgrid"></div>
+    </div><!-- /left-scroll -->
+
+    <div class="left-footer">
+      <button id="gen-btn" onclick="generate()" disabled>✦ Generar</button>
+    </div>
+  </div><!-- /left -->
+
+  <!-- CENTER -->
+  <div id="center">
+    <!-- Model strip -->
+    <div id="model-strip-wrap">
+      <div id="model-strip-head">
+        <div class="sec-label" style="margin-bottom:0">Modelo</div>
+        <div id="model-count" class="sec-label" style="margin-bottom:0"></div>
+      </div>
+      <div id="model-strip"></div>
+    </div>
+
+    <!-- Result -->
+    <div id="result-area">
+      <div id="progress-bar-wrap" style="display:none">
+        <div id="progress-bar"></div>
+      </div>
+      <div id="result-content">
+        <div class="result-empty" id="empty-state">
+          <div class="result-empty-icon" id="empty-icon">✦</div>
+          <div class="result-empty-text">El resultado aparecerá aquí</div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /center -->
+
+  <!-- HISTORY (hidden by default) -->
+  <div id="hist-panel" style="display:none">
+    <div id="hist-head">Historial · <span id="hist-count2">0</span></div>
+    <div id="hist-list"><div class="hist-empty">Sin historial aún</div></div>
   </div>
-</div>
 
 </div><!-- /main -->
 
-<!-- FILE INPUTS -->
-<input id="fi-edit" type="file" accept="image/*" style="display:none" onchange="handleFile(event,'edit')">
-<input id="fi-i2v" type="file" accept="image/*" style="display:none" onchange="handleFile(event,'i2v')">
-<input id="fi-enhance" type="file" accept="image/*" style="display:none" onchange="handleFile(event,'enhance')">
-
-<!-- RESULT PANEL -->
-<div id="rp">
-  <div id="rtop">
-    <button id="rbk" onclick="closeR()">←</button>
-    <div id="rtitle">Resultado</div>
-    <div id="rmodel"></div>
-  </div>
-  <div id="rscroll"></div>
-</div>
-
-<!-- NAV -->
-<div id="nav">
-  <button class="nav-btn active" data-sec="t2i" onclick="go('t2i')"><span class="ni">✦</span>Imagen</button>
-  <button class="nav-btn" data-sec="edit" onclick="go('edit')"><span class="ni">✏️</span>Editar</button>
-  <button class="nav-btn" data-sec="i2v" onclick="go('i2v')"><span class="ni">▶️</span>Img→Vid</button>
-  <button class="nav-btn" data-sec="t2v" onclick="go('t2v')"><span class="ni">🎬</span>T2V</button>
-  <button class="nav-btn" data-sec="enhance" onclick="go('enhance')"><span class="ni">⬆️</span>Mejorar</button>
-  <button class="nav-btn" data-sec="audio" onclick="go('audio')"><span class="ni">🎵</span>Audio</button>
-</div>
-
-<!-- MODAL -->
-<div id="mo" class="hidden">
-  <div id="md">
-    <div class="mdh"></div>
-    <div class="mdt">Hugging Face Token</div>
-    <div class="mds">Gratis en <a href="https://huggingface.co/settings/tokens" target="_blank">huggingface.co/settings/tokens</a> — tipo <b>Read</b></div>
-    <input id="mdi" class="mdi" type="password" placeholder="hf_xxxxxxxxxxxxxxxxxxxx" oninput="document.getElementById('mdok').disabled=!this.value.trim()">
-    <div class="mdbtns">
-      <button class="mdbtn c" onclick="closeModal()">Cancelar</button>
-      <button class="mdbtn ok" id="mdok" onclick="saveKey()" disabled>Guardar</button>
+<!-- API KEY MODAL -->
+<div id="modal-overlay" class="hidden">
+  <div id="modal">
+    <div class="modal-title">API Key de MuAPI</div>
+    <div class="modal-sub">Obtén tu key en <a href="https://muapi.ai" target="_blank">muapi.ai</a> para desbloquear todos los modelos de imagen, video y audio.</div>
+    <input id="modal-input" class="modal-input" type="password" placeholder="mua_xxxxxxxxxxxx" autocomplete="off">
+    <div class="modal-btns">
+      <button class="modal-btn cancel" onclick="closeModal()">Cancelar</button>
+      <button class="modal-btn confirm" id="modal-confirm" onclick="saveKey()" disabled>Guardar</button>
     </div>
-    <button class="mddel" id="mddel" style="display:none" onclick="delKey()">Eliminar token guardado</button>
+    <button class="modal-btn-del" id="modal-del" style="display:none" onclick="deleteKey()">Eliminar key guardada</button>
   </div>
 </div>
 
 <script>
-const HF_API = 'https://api-inference.huggingface.co/models/';
-const HF_ROUTER = 'https://router.huggingface.co/hf-inference/models/';
+// ─── DATA ───────────────────────────────────────────────────────────────────
+const SECTIONS = {
+  t2i:    { label:'Text → Image',   icon:'✦', color:'var(--accent)', isVid:false, needImg:false },
+  edit:   { label:'Edit Image',     icon:'✏', color:'var(--v)',      isVid:false, needImg:true  },
+  i2v:    { label:'Image → Video',  icon:'▶', color:'var(--p)',      isVid:true,  needImg:true  },
+  t2v:    { label:'Text → Video',   icon:'🎬',color:'var(--o)',      isVid:true,  needImg:false },
+  vfx:    { label:'VFX / Effects',  icon:'✨', color:'var(--g)',      isVid:true,  needImg:true  },
+  audio:  { label:'Audio & Music',  icon:'♪', color:'var(--y)',      isVid:false, needImg:false, isAudio:true },
+  upscale:{ label:'Upscale',        icon:'⬆', color:'var(--b)',      isVid:false, needImg:true, noPrompt:true },
+};
 
-// ── MODELS ────────────────────────────────────────────────────────────────────
 const MODELS = {
   t2i: [
-    {id:'flux-schnell', hf:'black-forest-labs/FLUX.1-schnell', name:'Flux Schnell', badge:'⚡Fast', bc:'#22d3ee', desc:'Más rápido'},
-    {id:'flux-dev',     hf:'black-forest-labs/FLUX.1-dev',     name:'Flux Dev',     badge:'HQ',     bc:'#60a5fa', desc:'Alta calidad'},
-    {id:'sdxl',         hf:'stabilityai/stable-diffusion-xl-base-1.0', name:'SDXL', badge:'SD',    bc:'#a78bfa', desc:'Clásico'},
-    {id:'sd35-turbo',   hf:'stabilityai/stable-diffusion-3.5-large-turbo', name:'SD 3.5 Turbo', badge:'Fast', bc:'#fb923c', desc:'SD3 rápido'},
-    {id:'sd35-med',     hf:'stabilityai/stable-diffusion-3.5-medium', name:'SD 3.5 Med', badge:'SD3', bc:'#f472b6', desc:'SD3 balanced'},
-    {id:'kolors',       hf:'Kwai-Kolors/Kolors', name:'Kolors', badge:'Kwai', bc:'#34d399', desc:'Colorido'},
-    {id:'playground',   hf:'playgroundai/playground-v2.5-1024px-aesthetic', name:'Playground v2.5', badge:'Play', bc:'#fbbf24', desc:'Estético'},
-    {id:'proteus',      hf:'dataautogpt3/ProteusV0.4', name:'Proteus v0.4', badge:'Real', bc:'#f43f5e', desc:'Realista'},
-    {id:'animagine',    hf:'cagliostrolab/animagine-xl-3.1', name:'Animagine XL', badge:'Anime', bc:'#ec4899', desc:'Anime'},
-    {id:'dreamshaper',  hf:'Lykon/dreamshaper-xl-1-0', name:'DreamShaper XL', badge:'Dream', bc:'#8b5cf6', desc:'Creativo'},
-    {id:'juggernaut',   hf:'RunDiffusion/Juggernaut-XL-v9', name:'Juggernaut XL', badge:'Photo', bc:'#f59e0b', desc:'Fotorrealista'},
-    {id:'pixart',       hf:'PixArt-alpha/PixArt-Sigma-XL-2-1024-MS', name:'PixArt Sigma', badge:'PixArt', bc:'#06b6d4', desc:'Alta res'},
+    {id:'flux-schnell',ep:'flux-schnell-image',name:'Flux Schnell',badge:'Fast',bc:'#22d3ee',desc:'Ultra-rápido'},
+    {id:'flux-dev',ep:'flux-dev-image',name:'Flux Dev',badge:'HQ',bc:'#60a5fa',desc:'Alta calidad'},
+    {id:'flux-kontext-pro-t2i',ep:'flux-kontext-pro',name:'Flux Kontext Pro',badge:'Pro',bc:'#a78bfa',desc:'Contexto avanzado'},
+    {id:'flux-kontext-max-t2i',ep:'flux-kontext-max',name:'Flux Kontext Max',badge:'Max',bc:'#c084fc',desc:'Máxima fidelidad'},
+    {id:'midjourney-v7-text-to-image',ep:'midjourney-v7-text-to-image',name:'Midjourney v7',badge:'MJ',bc:'#f472b6',desc:'Estilo artístico'},
+    {id:'google-imagen4',ep:'google-imagen4',name:'Imagen 4',badge:'Google',bc:'#34a8f5',desc:'DeepMind'},
+    {id:'google-imagen4-ultra',ep:'google-imagen4-ultra',name:'Imagen 4 Ultra',badge:'Ultra',bc:'#818cf8',desc:'Máxima calidad'},
+    {id:'gpt4o-text-to-image',ep:'gpt4o-text-to-image',name:'GPT-4o Image',badge:'GPT',bc:'#10b981',desc:'OpenAI nativo'},
+    {id:'ideogram-v3-t2i',ep:'ideogram-v3',name:'Ideogram v3',badge:'Text',bc:'#fb923c',desc:'Ideal con texto'},
+    {id:'hidream-i1-full',ep:'hidream-i1-full',name:'HiDream i1',badge:'New',bc:'#34d399',desc:'Alta resolución'},
+    {id:'grok-imagine-text-to-image',ep:'grok-imagine-text-to-image',name:'Grok Imagine',badge:'xAI',bc:'#6366f1',desc:'xAI'},
+    {id:'nano-banana',ep:'nano-banana',name:'Nano Banana',badge:'Fast',bc:'#fbbf24',desc:'Ligero'},
+    {id:'ai-anime-generator',ep:'ai-anime-generator',name:'Anime Gen',badge:'Anime',bc:'#f472b6',desc:'Estilo anime'},
+    {id:'bytedance-seedream-v4.5',ep:'bytedance-seedream-v4.5',name:'Seedream 4.5',badge:'ByteDance',bc:'#f43f5e',desc:'Premium'},
   ],
   edit: [
-    {id:'ip2p',       hf:'timbrooks/instruct-pix2pix',                     name:'InstructPix2Pix', badge:'Edit',   bc:'#a78bfa', desc:'Edición instruccional'},
-    {id:'flux-fill',  hf:'black-forest-labs/FLUX.1-schnell',               name:'Flux Style',      badge:'Flux',   bc:'#22d3ee', desc:'Estilo con Flux'},
-    {id:'sdxl-ref',   hf:'stabilityai/stable-diffusion-xl-refiner-1.0',    name:'SDXL Refiner',    badge:'Refine', bc:'#60a5fa', desc:'Refinado SDXL'},
-    {id:'kandinsky',  hf:'kandinsky-community/kandinsky-2-2-decoder',       name:'Kandinsky 2.2',   badge:'K2',     bc:'#f472b6', desc:'Artístico ruso'},
-    {id:'lcm-lora',   hf:'latent-consistency/lcm-lora-sdxl',               name:'LCM LoRA SDXL',   badge:'Fast',   bc:'#34d399', desc:'Ultra rápido'},
+    {id:'flux-kontext-dev-i2i',ep:'flux-kontext-dev',name:'Flux Kontext Dev',badge:'Edit',bc:'#a78bfa',desc:'Edición contextual'},
+    {id:'flux-kontext-pro-i2i',ep:'flux-kontext-pro-i2i',name:'Flux Kontext Pro',badge:'Pro',bc:'#c084fc',desc:'Pro edición'},
+    {id:'gpt4o-edit',ep:'gpt4o-edit',name:'GPT-4o Edit',badge:'GPT',bc:'#10b981',desc:'Instruccional'},
+    {id:'gpt-image-2-edit',ep:'gpt-image-2-image-to-image',name:'GPT Image 2',badge:'GPT',bc:'#10b981',desc:'Avanzado OpenAI'},
+    {id:'nano-banana-edit',ep:'nano-banana-edit',name:'Nano Banana Edit',badge:'Fast',bc:'#22d3ee',desc:'Rápido'},
+    {id:'ai-background-remover',ep:'ai-background-remover',name:'Remove BG',badge:'Auto',bc:'#34d399',desc:'Fondo automático'},
+    {id:'ai-object-eraser',ep:'ai-object-eraser',name:'Object Eraser',badge:'Inpaint',bc:'#fb923c',desc:'Borra objetos'},
+    {id:'ai-image-extension',ep:'ai-image-extension',name:'Image Extend',badge:'Outpaint',bc:'#f472b6',desc:'Expande bordes'},
+    {id:'ai-image-face-swap',ep:'ai-image-face-swap',name:'Face Swap',badge:'Face',bc:'#f43f5e',desc:'Intercambia caras'},
+    {id:'ai-dress-change',ep:'ai-dress-change',name:'Dress Change',badge:'Fashion',bc:'#ec4899',desc:'Cambia ropa'},
+    {id:'ai-skin-enhancer',ep:'ai-skin-enhancer',name:'Skin Enhancer',badge:'Beauty',bc:'#f9a8d4',desc:'Mejora piel'},
+    {id:'ai-color-photo',ep:'ai-color-photo',name:'Colorize',badge:'Color',bc:'#fbbf24',desc:'Coloriza B&N'},
+    {id:'ai-ghibli-style',ep:'ai-ghibli-style',name:'Ghibli Style',badge:'Ghibli',bc:'#34d399',desc:'Estilo Ghibli'},
+    {id:'bytedance-seededit-v3',ep:'bytedance-seededit-image',name:'SeedEdit v3',badge:'ByteDance',bc:'#f43f5e',desc:'Edición bytedance'},
+    {id:'qwen-image-edit',ep:'qwen-image-edit',name:'Qwen Edit',badge:'Qwen',bc:'#06b6d4',desc:'Alibaba'},
+    {id:'reve-image-edit',ep:'reve-image-edit',name:'Reve Edit',badge:'Reve',bc:'#8b5cf6',desc:'Creativo'},
+    {id:'ai-product-shot',ep:'ai-product-shot',name:'Product Shot',badge:'Commerce',bc:'#fb923c',desc:'Foto producto'},
+    {id:'wan2.6-image-edit',ep:'wan2.6-image-edit',name:'Wan 2.6 Edit',badge:'Wan',bc:'#14b8a6',desc:'Wan2.6'},
+    {id:'ai-product-photography',ep:'ai-product-photography',name:'Product Photo',badge:'Commerce',bc:'#fb923c',desc:'Fotografía producto'},
   ],
   i2v: [
-    {id:'i2vgen',   hf:'ali-vilab/i2vgen-xl', name:'I2VGen-XL', badge:'Ali', bc:'#f472b6', desc:'Imagen a video'},
-    {id:'svd',      hf:'stabilityai/stable-video-diffusion-img2vid-xt-1-1', name:'SVD XT 1.1', badge:'SVD', bc:'#a78bfa', desc:'Stable Video'},
+    {id:'kling-v3.0-pro-image-to-video',ep:'kling-v3.0-pro-image-to-video',name:'Kling v3.0 Pro',badge:'⭐ Best',bc:'#fbbf24',desc:'Último Kling Pro'},
+    {id:'kling-v3.0-standard-image-to-video',ep:'kling-v3.0-standard-image-to-video',name:'Kling v3.0 Std',badge:'New',bc:'#34d399',desc:'Kling 3.0 Std'},
+    {id:'kling-v2.1-master-i2v',ep:'kling-v2.1-master-i2v',name:'Kling v2.1 Master',badge:'Master',bc:'#fb923c',desc:'Máxima calidad'},
+    {id:'veo3-image-to-video',ep:'veo3-image-to-video',name:'Veo 3',badge:'Google',bc:'#34a8f5',desc:'Con audio nativo'},
+    {id:'veo3.1-image-to-video',ep:'veo3.1-image-to-video',name:'Veo 3.1',badge:'New',bc:'#34d399',desc:'Google nuevo'},
+    {id:'openai-sora-2-image-to-video',ep:'openai-sora-2-image-to-video',name:'Sora 2',badge:'OpenAI',bc:'#10b981',desc:'OpenAI Sora 2'},
+    {id:'runway-image-to-video',ep:'runway-image-to-video',name:'Runway Gen-4',badge:'Cinema',bc:'#f59e0b',desc:'Cinematográfico'},
+    {id:'minimax-hailuo-2.3-pro-i2v',ep:'minimax-hailuo-2.3-pro-i2v',name:'Hailuo 2.3 Pro',badge:'New',bc:'#34d399',desc:'Más reciente'},
+    {id:'wan2.2-image-to-video',ep:'wan2.2-image-to-video',name:'Wan 2.2',badge:'Open',bc:'#14b8a6',desc:'Open source'},
+    {id:'hunyuan-image-to-video',ep:'hunyuan-image-to-video',name:'Hunyuan I2V',badge:'Tencent',bc:'#3b82f6',desc:'Tencent'},
+    {id:'ltx-2-pro-image-to-video',ep:'ltx-2-pro-image-to-video',name:'LTX 2 Pro',badge:'LTX',bc:'#60a5fa',desc:'Lightricks'},
+    {id:'pixverse-v5-i2v',ep:'pixverse-v5-i2v',name:'PixVerse v5',badge:'New',bc:'#34d399',desc:'PixVerse'},
+    {id:'seedance-pro-i2v',ep:'seedance-pro-i2v',name:'Seedance Pro',badge:'ByteDance',bc:'#f43f5e',desc:'Cinema'},
+    {id:'grok-imagine-image-to-video',ep:'grok-imagine-image-to-video',name:'Grok I2V',badge:'xAI',bc:'#6366f1',desc:'xAI Grok'},
+    {id:'minimax-hailuo-02-pro-i2v',ep:'minimax-hailuo-02-pro-i2v',name:'Hailuo 02 Pro',badge:'Pro',bc:'#a78bfa',desc:'Minimax'},
   ],
   t2v: [
-    {id:'t2v-ms',   hf:'damo-vilab/text-to-video-ms-1.7b', name:'Text2Video-Zero', badge:'Free', bc:'#fb923c', desc:'T2V gratuito'},
-    {id:'zeroscope',hf:'cerspense/zeroscope_v2_576w', name:'ZeroScope v2', badge:'Zero', bc:'#f43f5e', desc:'Rápido'},
+    {id:'veo3-text-to-video',ep:'veo3-text-to-video',name:'Veo 3',badge:'Google',bc:'#34a8f5',desc:'Con audio nativo'},
+    {id:'veo3.1-text-to-video',ep:'veo3.1-text-to-video',name:'Veo 3.1',badge:'New',bc:'#34d399',desc:'Más reciente'},
+    {id:'kling-v3.0-pro-text-to-video',ep:'kling-v3.0-pro-text-to-video',name:'Kling v3.0 Pro',badge:'⭐ Best',bc:'#fbbf24',desc:'Kling último'},
+    {id:'openai-sora-2-text-to-video',ep:'openai-sora-2-text-to-video',name:'Sora 2',badge:'OpenAI',bc:'#10b981',desc:'OpenAI Sora 2'},
+    {id:'openai-sora-2-pro-text-to-video',ep:'openai-sora-2-pro-text-to-video',name:'Sora 2 Pro',badge:'Pro',bc:'#a78bfa',desc:'Pro'},
+    {id:'runway-text-to-video',ep:'runway-text-to-video',name:'Runway Gen-4',badge:'Cinema',bc:'#f59e0b',desc:'Cinematográfico'},
+    {id:'wan2.6-text-to-video',ep:'wan2.6-text-to-video',name:'Wan 2.6',badge:'New',bc:'#34d399',desc:'Más reciente'},
+    {id:'wan2.5-text-to-video',ep:'wan2.5-text-to-video',name:'Wan 2.5',badge:'Open',bc:'#14b8a6',desc:'Open source'},
+    {id:'hunyuan-text-to-video',ep:'hunyuan-text-to-video',name:'Hunyuan T2V',badge:'Tencent',bc:'#3b82f6',desc:'Alta calidad'},
+    {id:'ltx-2-pro-text-to-video',ep:'ltx-2-pro-text-to-video',name:'LTX 2 Pro',badge:'LTX',bc:'#60a5fa',desc:'Lightricks'},
+    {id:'ltx-2-19b-text-to-video',ep:'ltx-2-19b-text-to-video',name:'LTX 2 19B',badge:'Large',bc:'#6366f1',desc:'Modelo grande'},
+    {id:'grok-imagine-text-to-video',ep:'grok-imagine-text-to-video',name:'Grok T2V',badge:'xAI',bc:'#6366f1',desc:'xAI Grok'},
   ],
-  enhance: [
-    {id:'upscale',   hf:'caidas/swin2SR-classical-sr-x2-64',              name:'Swin2SR 2x',    badge:'2x',    bc:'#60a5fa', desc:'Upscale 2x'},
-    {id:'upscale4',  hf:'caidas/swin2SR-compressed-sr-x4-48',             name:'Swin2SR 4x',    badge:'4x',    bc:'#22d3ee', desc:'Upscale 4x'},
-    {id:'realesrgan',hf:'ai-forever/Real-ESRGAN',                         name:'Real-ESRGAN',   badge:'Photo', bc:'#34d399', desc:'Foto realista'},
-    {id:'gfpgan',    hf:'tencentarc/gfpgan',                              name:'GFPGAN',        badge:'Face',  bc:'#f472b6', desc:'Restaura caras'},
-    {id:'depth',     hf:'Intel/dpt-large',                                name:'Depth Map',     badge:'Depth', bc:'#fbbf24', desc:'Profundidad'},
-    {id:'seg',       hf:'facebook/maskformer-swin-large-coco',            name:'Segmentación',  badge:'Seg',   bc:'#fb923c', desc:'Segmentar objetos'},
-    {id:'caption',   hf:'Salesforce/blip-image-captioning-large',         name:'BLIP Caption',  badge:'Cap',   bc:'#a78bfa', desc:'Describe imagen'},
-    {id:'nsfw',      hf:'Falconsai/nsfw_image_detection',                 name:'Detector NSFW', badge:'Det',   bc:'#94a3b8', desc:'Clasifica contenido'},
+  vfx: [
+    {id:'ai-video-effects',ep:'ai-video-effects',name:'AI Video FX',badge:'WAN',bc:'#14b8a6',desc:'Efectos sobre video'},
+    {id:'motion-controls',ep:'motion-controls',name:'Motion Controls',badge:'Motion',bc:'#22d3ee',desc:'Control movimiento'},
+    {id:'vfx',ep:'vfx',name:'VFX',badge:'VFX',bc:'#a78bfa',desc:'Efectos visuales'},
+    {id:'flux-kontext-effects',ep:'flux-kontext-effects',name:'Flux Kontext FX',badge:'Flux',bc:'#22d3ee',desc:'Efectos Flux'},
+    {id:'nano-banana-effects',ep:'nano-banana-effects',name:'Nano Banana FX',badge:'FX',bc:'#34d399',desc:'Efectos Nano'},
+    {id:'image-effects',ep:'image-effects',name:'Image Effects',badge:'FX',bc:'#34d399',desc:'Efectos imagen'},
+    {id:'video-effects',ep:'video-effects',name:'Video Effects',badge:'Video',bc:'#f472b6',desc:'Efectos video'},
+    {id:'kling-v3.0-pro-motion-control',ep:'kling-v3.0-pro-motion-control',name:'Kling v3 Motion',badge:'New',bc:'#34d399',desc:'Kling 3.0 motion'},
+    {id:'kling-v2.6-std-motion-control',ep:'kling-v2.6-std-motion-control',name:'Kling Motion Ctrl',badge:'Motion',bc:'#22d3ee',desc:'Control cámara'},
+    {id:'seedance-v2.0-i2v',ep:'seedance-v2.0-i2v',name:'Seedance v2',badge:'ByteDance',bc:'#f43f5e',desc:'Seedance 2.0'},
+    {id:'infinitetalk-image-to-video',ep:'infinitetalk-image-to-video',name:'InfiniteTalk',badge:'Talk',bc:'#34d399',desc:'Habla en video'},
   ],
   audio: [
-    {id:'musicgen-sm',  hf:'facebook/musicgen-small',  name:'MusicGen Small',  badge:'Fast', bc:'#fbbf24', desc:'Música rápida'},
-    {id:'musicgen-med', hf:'facebook/musicgen-medium', name:'MusicGen Medium', badge:'Med',  bc:'#fb923c', desc:'Balanceado'},
-    {id:'musicgen-lg',  hf:'facebook/musicgen-large',  name:'MusicGen Large',  badge:'HQ',   bc:'#f43f5e', desc:'Alta calidad'},
-    {id:'audiogen',     hf:'facebook/audiogen-medium', name:'AudioGen',        badge:'SFX',  bc:'#34d399', desc:'Efectos de sonido'},
-    {id:'bark',         hf:'suno-ai/bark',              name:'Bark TTS',        badge:'TTS',  bc:'#a78bfa', desc:'Texto a voz'},
+    {id:'suno-create-music',ep:'suno-create-music',name:'Suno Create',badge:'Music',bc:'#f59e0b',desc:'Genera música'},
+    {id:'suno-extend-music',ep:'suno-extend-music',name:'Suno Extend',badge:'Extend',bc:'#fb923c',desc:'Extiende canción'},
+    {id:'suno-remix-music',ep:'suno-remix-music',name:'Suno Remix',badge:'Remix',bc:'#f43f5e',desc:'Remixea'},
+    {id:'mmaudio-v2-text-to-audio',ep:'mmaudio-v2-text-to-audio',name:'MMAudio',badge:'Audio',bc:'#fbbf24',desc:'Texto a audio'},
+    {id:'minimax-speech-2.6-hd',ep:'minimax-speech-2.6-hd',name:'Speech HD',badge:'TTS',bc:'#8b5cf6',desc:'Voz hiperrealista'},
+    {id:'minimax-voice-clone',ep:'minimax-voice-clone',name:'Voice Clone',badge:'Clone',bc:'#ec4899',desc:'Clona voz'},
+    {id:'sync-lipsync',ep:'sync-lipsync',name:'Sync Lipsync',badge:'Sync',bc:'#22d3ee',desc:'Sincroniza labios'},
+    {id:'creatify-lipsync',ep:'creatify-lipsync',name:'Creatify Lipsync',badge:'Lip',bc:'#f43f5e',desc:'Lipsync creativo'},
+    {id:'ltx-2-19b-lipsync',ep:'ltx-2-19b-lipsync',name:'LTX Lipsync',badge:'LTX',bc:'#60a5fa',desc:'Lipsync preciso'},
+    {id:'wan2.2-speech-to-video',ep:'wan2.2-speech-to-video',name:'Speech to Video',badge:'S2V',bc:'#06b6d4',desc:'Audio a video'},
+    {id:'veed-lipsync',ep:'veed-lipsync',name:'Veed Lipsync',badge:'Veed',bc:'#a78bfa',desc:'Lipsync Veed'},
+  ],
+  upscale: [
+    {id:'ai-image-upscaler',ep:'ai-image-upscaler',name:'AI Upscaler',badge:'2-4x',bc:'#60a5fa',desc:'Genérico'},
+    {id:'topaz-image-upscale',ep:'topaz-image-upscale',name:'Topaz Upscale',badge:'Topaz',bc:'#22d3ee',desc:'Topaz Labs pro'},
+    {id:'seedvr2-image-upscale',ep:'seedvr2-image-upscale',name:'SeedVR2',badge:'ByteDance',bc:'#f43f5e',desc:'Seedance video'},
+    {id:'add-image-watermark',ep:'add-image-watermark',name:'Add Watermark',badge:'Mark',bc:'#94a3b8',desc:'Marca de agua'},
   ],
 };
 
 const EXAMPLES = {
-  t2i:['A majestic lion in a golden savanna, photorealistic, dramatic lighting','Futuristic Tokyo street at night, neon signs, rain reflections, cinematic','Underwater world with bioluminescent creatures, dark ocean, magical'],
-  edit:['Convert to Studio Ghibli animation style','Add dramatic storm clouds to the background','Make it look like a vintage 1970s photograph'],
-  i2v:['Camera slowly zooms in, gentle motion blur','Subject turns to look at the camera naturally','Cinematic dolly shot moving forward slowly'],
-  t2v:['A timelapse of clouds moving over mountains at sunset','Ocean waves crashing on rocky shore, slow motion','Colorful fireworks exploding in night sky'],
-  enhance:[''],
-  audio:['Upbeat electronic dance music with heavy bass, 120 BPM','Calm piano melody for meditation, peaceful and slow','Epic orchestral battle theme, dramatic strings and brass'],
+  t2i:['A solitary lighthouse on a rocky cliff at twilight, dramatic storm clouds, volumetric rays','Hyperrealistic portrait of an elderly woman with intricate face tattoos, studio lighting','Aerial view of a futuristic city at night, neon grids, flying vehicles, ultra detail'],
+  edit:['Remove the background and replace with a gradient studio','Make the person look 20 years younger','Convert to Studio Ghibli animation style'],
+  i2v:['Camera slowly orbits the subject, soft cinematic bokeh','Gentle wind blows through hair, natural movement','Dramatic dolly zoom pulling back to reveal the environment'],
+  t2v:['A timelapse of a city street from dawn to midnight, cinematic 4K','Underwater scene of a coral reef, colorful fish, shafts of light from above','A lone wolf running through a snowy forest, aerial tracking shot'],
+  vfx:['Add dramatic fire and ember particles around the subject','Transform the scene into a slow-motion water explosion','Apply teal and orange Hollywood color grade'],
+  audio:['Upbeat electronic music with synth leads and heavy bass, 120 BPM','Calm ambient soundtrack with piano and soft strings','Short tech startup jingle, energetic and modern'],
+  upscale:['Enhance to 4x resolution, sharpen details, reduce noise'],
 };
 
-const SEC_COLORS = {t2i:'var(--c)',edit:'var(--v)',i2v:'var(--p)',t2v:'var(--o)',enhance:'var(--b)',audio:'var(--y)'};
-const SEC_NEEDS_IMG = {edit:true, i2v:true, enhance:true};
-
-const SIZES = ['512×512','768×768','1024×1024','1024×768','768×1024'];
-const STEPS_LIST = [10,20,28,35,50];
-
-// ── STATE ─────────────────────────────────────────────────────────────────────
-let hfKey = localStorage.getItem('hf_key') || '';
-let curSec = 't2i';
-let selModel = {};
-let uploads = {};
-let urlVals = {};
-let history = JSON.parse(localStorage.getItem('og_history') || '[]');
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let apiKey = '';
+let currentSection = 't2i';
+let selectedModel = {};
+let uploadedImageUrl = null;
+let uploadedIsUrl = false;
+let history = [];
+let historySelectedIdx = -1;
 let generating = false;
-let curSize = {};
-let curSteps = {t2i: 28};
+let progress = 0;
+let progressInterval = null;
+let showingHistory = false;
 
-// ── INIT ──────────────────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-  Object.keys(MODELS).forEach(buildModels);
-  buildSizeSteps();
-  updateKeyBtn();
-  updateHCount();
-  Object.keys(MODELS).forEach(s => updateBtn(s));
-  document.getElementById('mdi').addEventListener('keydown', e => { if(e.key==='Enter') saveKey(); });
-  if (!hfKey) setTimeout(openModal, 600);
-});
+const ratios_img = ['1:1','16:9','9:16','4:3','3:4','21:9'];
+const ratios_vid = ['16:9','9:16','1:1','4:3'];
+const durations = [5,10];
+const resolutions = ['480p','720p','1080p'];
+let currentImgRatio = '1:1';
+let currentVidRatio = '16:9';
+let currentDuration = 5;
+let currentResolution = '720p';
 
-// ── SECTION ───────────────────────────────────────────────────────────────────
-function go(sec) {
-  document.getElementById('hs').classList.remove('active');
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('screen-'+sec).classList.add('active');
-  document.querySelector(`.nav-btn[data-sec="${sec}"]`).classList.add('active');
-  curSec = sec;
-  const c = SEC_COLORS[sec];
-  document.documentElement.style.setProperty('--a', c);
-  document.getElementById('logo-icon').style.background = `linear-gradient(135deg,${c},#6366f1)`;
-}
 
-// ── MODELS ────────────────────────────────────────────────────────────────────
-function buildModels(sec) {
-  const cont = document.getElementById('m-'+sec);
-  const cnt = document.getElementById('cnt-'+sec);
-  if (!cont) return;
-  const ms = MODELS[sec] || [];
-  if (cnt) cnt.textContent = ms.length;
-  if (!selModel[sec]) selModel[sec] = ms[0]?.id;
-  cont.innerHTML = '';
-  ms.forEach(m => {
-    const c = document.createElement('div');
-    c.className = 'mchip' + (m.id === selModel[sec] ? ' sel' : '');
-    c.innerHTML = `<div class="mn">${m.name}</div><div class="mm"><span class="mb" style="background:${m.bc}18;color:${m.bc};border:1px solid ${m.bc}30">${m.badge}</span><span class="md">${m.desc}</span></div>`;
-    c.onclick = () => {
-      selModel[sec] = m.id;
-      cont.querySelectorAll('.mchip').forEach(x=>x.classList.remove('sel'));
-      c.classList.add('sel');
-      updateBtn(sec);
-    };
-    cont.appendChild(c);
-  });
-}
-
-function buildSizeSteps() {
-  const sc = document.getElementById('size-t2i');
-  curSize.t2i = '1024×1024';
-  SIZES.forEach(s => {
-    const b = document.createElement('button');
-    b.className = 'pill' + (s === curSize.t2i ? ' on' : '');
-    b.textContent = s;
-    b.onclick = () => { curSize.t2i=s; sc.querySelectorAll('.pill').forEach(x=>x.classList.remove('on')); b.classList.add('on'); };
-    sc.appendChild(b);
-  });
-  const st = document.getElementById('steps-t2i');
-  STEPS_LIST.forEach(n => {
-    const b = document.createElement('button');
-    b.className = 'pill' + (n === curSteps.t2i ? ' on' : '');
-    b.textContent = n;
-    b.onclick = () => { curSteps.t2i=n; st.querySelectorAll('.pill').forEach(x=>x.classList.remove('on')); b.classList.add('on'); };
-    st.appendChild(b);
-  });
-}
-
-// ── PROMPT ────────────────────────────────────────────────────────────────────
-function onPI(sec) {
-  const v = document.getElementById('p-'+sec)?.value || '';
-  const pc = document.getElementById('pc-'+sec);
-  if (pc) pc.textContent = v.length+'/1000';
-  updateBtn(sec);
-}
-
-function fillEx(sec) {
-  const ta = document.getElementById('p-'+sec);
-  if (!ta) return;
-  const exs = EXAMPLES[sec]||[];
-  ta.value = exs[Math.floor(Math.random()*exs.length)]||'';
-  onPI(sec);
-}
-
-function toggleNeg(sec) {
-  const chk = document.getElementById('neg-chk-'+sec);
-  const ta = document.getElementById('neg-'+sec);
-  if (ta) ta.style.display = chk.checked ? 'block' : 'none';
-}
-
-// ── UPLOAD ────────────────────────────────────────────────────────────────────
-function trigUp(sec) { document.getElementById('fi-'+sec)?.click(); }
-function handleFile(e, sec) { const f=e.target.files[0]; if(f) readF(f,sec); }
-function handleDrop(e, sec) { e.preventDefault(); const f=e.dataTransfer.files[0]; if(f) readF(f,sec); }
-function readF(file, sec) {
-  const r = new FileReader();
-  r.onload = ev => {
-    uploads[sec] = ev.target.result;
-    urlVals[sec] = '';
-    const ui = document.getElementById('url-'+sec);
-    if (ui) ui.value = '';
-    document.getElementById('dz-'+sec).style.display = 'none';
-    const up = document.getElementById('up-'+sec);
-    up.style.display = 'block';
-    document.getElementById('uimg-'+sec).src = ev.target.result;
-    updateBtn(sec);
-  };
-  r.readAsDataURL(file);
-}
-function clrUp(sec) {
-  uploads[sec] = null;
-  document.getElementById('dz-'+sec).style.display = 'block';
-  document.getElementById('up-'+sec).style.display = 'none';
-  const fi = document.getElementById('fi-'+sec);
-  if (fi) fi.value = '';
-  updateBtn(sec);
-}
-function onUrl(sec) {
-  urlVals[sec] = document.getElementById('url-'+sec).value.trim();
-  updateBtn(sec);
-}
-function getImg(sec) {
-  if (urlVals[sec]) return { type:'url', v: urlVals[sec] };
-  if (uploads[sec]) return { type:'data', v: uploads[sec] };
-  return null;
-}
-
-// ── GEN BTN ───────────────────────────────────────────────────────────────────
-function updateBtn(sec) {
-  const btn = document.getElementById('gbtn-'+sec);
-  if (!btn) return;
-  const c = SEC_COLORS[sec];
-  const prompt = (document.getElementById('p-'+sec)?.value||'').trim();
-  const hasP = sec === 'enhance' || !!prompt;
-  const hasImg = !SEC_NEEDS_IMG[sec] || !!getImg(sec);
-  btn.disabled = generating || !hasP || !hasImg;
-  btn.style.background = btn.disabled ? 'rgba(255,255,255,.07)' : `linear-gradient(135deg,${c},#6366f1)`;
-}
-
-// ── GENERATE ─────────────────────────────────────────────────────────────────
-async function generate(sec) {
-  if (!hfKey) { openModal(); return; }
-  const ms = MODELS[sec]||[];
-  const model = ms.find(m=>m.id===(selModel[sec]||ms[0]?.id))||ms[0];
-  if (!model) return;
-
-  generating = true;
-  Object.keys(MODELS).forEach(s => updateBtn(s));
-  showR();
-  setLoading('Conectando con '+model.name+'...');
-
-  try {
-    const prompt = document.getElementById('p-'+sec)?.value.trim()||'';
-    const negPrompt = document.getElementById('neg-'+sec)?.value.trim()||'';
-
-    let resultBlob;
-
-    if (sec === 't2i') {
-      resultBlob = await hfT2I(model.hf, prompt, negPrompt);
-    } else if (sec === 'edit') {
-      const imgData = getImg(sec);
-      if (!imgData) throw new Error('Sube una imagen primero');
-      resultBlob = await hfEdit(model.hf, prompt, imgData);
-    } else if (sec === 'i2v') {
-      const imgData = getImg(sec);
-      if (!imgData) throw new Error('Sube una imagen primero');
-      resultBlob = await hfI2V(model.hf, prompt, imgData);
-    } else if (sec === 't2v') {
-      resultBlob = await hfT2V(model.hf, prompt);
-    } else if (sec === 'enhance') {
-      const imgData = getImg(sec);
-      if (!imgData) throw new Error('Sube una imagen primero');
-      resultBlob = await hfEnhance(model.hf, imgData, prompt);
-    } else if (sec === 'audio') {
-      resultBlob = await hfAudio(model.hf, prompt);
-    }
-
-    const url = URL.createObjectURL(resultBlob);
-    const type = sec === 'audio' ? 'audio' : (sec === 'i2v' || sec === 't2v') ? 'video' : 'image';
-    const item = { url, blob: null, type, model: model.name, sec, prompt, time: Date.now() };
-    showRMedia(item);
-    addHist({ ...item, blobType: resultBlob.type });
-  } catch(e) {
-    showRErr(e.message);
-  } finally {
-    generating = false;
-    Object.keys(MODELS).forEach(s => updateBtn(s));
-  }
-}
-
-// ── HF API CALLS ──────────────────────────────────────────────────────────────
-async function hfCall(modelHf, payload, isJson = true) {
-  setLoadTxt('Generando con ' + modelHf.split('/')[1] + '...');
-  setProgress(20);
-
-  // Use router (more reliable for serverless inference)
-  const url = HF_ROUTER + modelHf;
-  const headers = {
-    'Authorization': 'Bearer ' + hfKey,
-    'x-wait-for-model': 'true',  // wait instead of 503
-  };
-  if (isJson) headers['Content-Type'] = 'application/json';
-
-  setLoadTxt('Esperando modelo (puede tardar 1-2 min la primera vez)...');
-  setProgress(25);
-
-  const res = await fetch(url, {
+// ─── IMGBB UPLOAD ─────────────────────────────────────────────────────────────
+async function uploadToImgbb(base64DataUrl) {
+  // Strip the data:image/xxx;base64, prefix
+  const base64 = base64DataUrl.split(',')[1];
+  const formData = new FormData();
+  formData.append('image', base64);
+  // Use imgbb free API (no key needed for anonymous uploads, 32MB limit)
+  const res = await fetch('https://api.imgbb.com/1/upload?key=temp_free&expiration=600', {
     method: 'POST',
-    headers,
-    body: isJson ? JSON.stringify(payload) : payload,
+    body: formData
   });
+  // If imgbb fails, fallback to freeimage.host
+  if (!res.ok) throw new Error('Upload fallback needed');
+  const data = await res.json();
+  return data.data.url;
+}
 
-  if (res.status === 503 || res.status === 504) {
-    // Explicit warmup wait
-    setLoadTxt('Modelo calentando, espera...');
-    setProgress(35);
-    await sleep(30000);
-    const res2 = await fetch(url, { method: 'POST', headers, body: isJson ? JSON.stringify(payload) : payload });
-    if (res2.ok) { setProgress(90); return await res2.blob(); }
-    const t2 = await res2.text();
-    throw new Error(`Error ${res2.status}: ${t2.slice(0, 120)}`);
-  }
+async function uploadImageForAPI(base64DataUrl) {
+  // Compress first to reduce file size
+  const compressed = await compressImage(base64DataUrl, 1280, 0.88);
+  const blob = await fetch(compressed).then(r => r.blob());
+  const file = new File([blob], 'image.jpg', { type: 'image/jpeg' });
 
+  // Use MuAPI's own upload endpoint — returns URLs already in their allowlist
+  const fd = new FormData();
+  fd.append('file', file);
+  const res = await fetch('https://api.muapi.ai/api/v1/upload_file', {
+    method: 'POST',
+    headers: { 'x-api-key': apiKey },
+    body: fd
+  });
   if (!res.ok) {
     const txt = await res.text();
-    // Better error messages
-    if (txt.includes('not supported by provider')) {
-      throw new Error('Este modelo no soporta Inference API gratuita. Prueba otro modelo.');
-    }
-    if (txt.includes('Authorization') || res.status === 401) {
-      throw new Error('Token inválido. Verifica tu HF token en el botón HF Key.');
-    }
-    if (res.status === 429) {
-      throw new Error('Límite de rate alcanzado. Espera 1 minuto e intenta de nuevo.');
-    }
-    throw new Error(`Error ${res.status}: ${txt.slice(0, 120)}`);
+    throw new Error(`Upload failed ${res.status}: ${txt.slice(0,100)}`);
+  }
+  const data = await res.json();
+  const url = data.url || data.file_url || data.data?.url;
+  if (!url) throw new Error('MuAPI upload did not return a URL');
+  return url;
+}
+
+async function compressImage(dataUrl, maxSize = 1024, quality = 0.85) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      let w = img.width, h = img.height;
+      if (w > maxSize || h > maxSize) {
+        if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+        else { w = Math.round(w * maxSize / h); h = maxSize; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.src = dataUrl;
+  });
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────
+function handleUrlInput(val) {
+  val = val.trim();
+  if (!val) return;
+  // Basic URL validation
+  try { new URL(val); } catch(e) { return; }
+  uploadedImageUrl = val;
+  uploadedIsUrl = true;
+  // Show preview
+  document.getElementById('upload-zone').style.display = 'none';
+  document.getElementById('upload-preview').style.display = 'block';
+  document.getElementById('upload-img').src = val;
+  updateGenBtn();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  buildPills();
+  switchSection('t2i');
+  document.getElementById('prompt-ta').addEventListener('input', onPromptInput);
+  document.getElementById('prompt-ta').addEventListener('keydown', e => { if(e.key==='Enter' && (e.metaKey||e.ctrlKey)) generate(); });
+  document.getElementById('modal-input').addEventListener('input', () => {
+    document.getElementById('modal-confirm').disabled = !document.getElementById('modal-input').value.trim();
+  });
+});
+
+function buildPills(){
+  // img ratio
+  const ir = document.getElementById('img-ratio-pills');
+  ratios_img.forEach(r => {
+    const b = document.createElement('button');
+    b.className = 'pill' + (r===currentImgRatio?' on':'');
+    b.textContent = r;
+    b.onclick = () => { currentImgRatio=r; ir.querySelectorAll('.pill').forEach(x=>x.classList.remove('on')); b.classList.add('on'); };
+    ir.appendChild(b);
+  });
+  // vid ratio
+  const vr = document.getElementById('vid-ratio-pills');
+  ratios_vid.forEach(r => {
+    const b = document.createElement('button');
+    b.className = 'pill' + (r===currentVidRatio?' on':'');
+    b.textContent = r;
+    b.onclick = () => { currentVidRatio=r; vr.querySelectorAll('.pill').forEach(x=>x.classList.remove('on')); b.classList.add('on'); };
+    vr.appendChild(b);
+  });
+  // duration
+  const dp = document.getElementById('dur-pills');
+  durations.forEach(d => {
+    const b = document.createElement('button');
+    b.className = 'pill' + (d===currentDuration?' on':'');
+    b.textContent = d+'s';
+    b.onclick = () => { currentDuration=d; dp.querySelectorAll('.pill').forEach(x=>x.classList.remove('on')); b.classList.add('on'); };
+    dp.appendChild(b);
+  });
+  // resolution
+  const rp = document.getElementById('res-pills');
+  resolutions.forEach(r => {
+    const b = document.createElement('button');
+    b.className = 'pill' + (r===currentResolution?' on':'');
+    b.textContent = r;
+    b.onclick = () => { currentResolution=r; rp.querySelectorAll('.pill').forEach(x=>x.classList.remove('on')); b.classList.add('on'); };
+    rp.appendChild(b);
+  });
+}
+
+// ─── SECTION SWITCH ──────────────────────────────────────────────────────────
+function switchSection(sec) {
+  currentSection = sec;
+  const info = SECTIONS[sec];
+
+  // Update topbar tabs
+  document.querySelectorAll('.sec-tab').forEach(t => t.classList.remove('active'));
+  document.querySelector(`.sec-tab[data-sec="${sec}"]`).classList.add('active');
+
+  // Update accent
+  document.documentElement.style.setProperty('--a', info.color);
+  document.getElementById('logo-icon').style.background = `linear-gradient(135deg, ${info.color}, #6366f1)`;
+  document.querySelector('#logo-text span').style.color = info.color.replace('var(','').replace(')','');
+
+  // Upload zone
+  document.getElementById('upload-section').style.display = info.needImg ? 'block' : 'none';
+
+  // Prompt section
+  document.getElementById('prompt-section').style.display = info.noPrompt ? 'none' : 'block';
+  if(!info.noPrompt){
+    const ta = document.getElementById('prompt-ta');
+    ta.style.setProperty('--a', info.color);
+    ta.placeholder = sec === 'audio' ? 'Describe el sonido o música...' : info.needImg ? 'Describe cómo transformar la imagen...' : 'Describe la imagen o video...';
   }
 
-  setProgress(90);
-  return await res.blob();
+  // Params
+  document.getElementById('param-img-ratio').style.display = (!info.isVid && !info.isAudio && !info.noPrompt) ? 'block' : 'none';
+  document.getElementById('param-vid').style.display = info.isVid ? 'block' : 'none';
+
+  // Models
+  buildModelStrip(sec);
+
+  // Gen btn
+  updateGenBtn();
+  setResultEmpty();
 }
 
-async function hfT2I(hf, prompt, negPrompt) {
-  const [w,h] = (curSize.t2i||'1024×1024').split('×').map(Number);
-  return hfCall(hf, {
-    inputs: prompt,
-    parameters: {
-      negative_prompt: negPrompt || undefined,
-      width: w, height: h,
-      num_inference_steps: curSteps.t2i || 28,
-      guidance_scale: 3.5,
+document.querySelectorAll('.sec-tab').forEach(t => {
+  t.addEventListener('click', () => switchSection(t.dataset.sec));
+});
+
+// ─── MODEL STRIP ─────────────────────────────────────────────────────────────
+function buildModelStrip(sec){
+  const strip = document.getElementById('model-strip');
+  strip.innerHTML = '';
+  const models = MODELS[sec] || [];
+  document.getElementById('model-count').textContent = `— ${models.length} disponibles`;
+  if(!selectedModel[sec]) selectedModel[sec] = models[0]?.id;
+
+  models.forEach(m => {
+    const chip = document.createElement('div');
+    chip.className = 'model-chip' + (m.id===selectedModel[sec]?' selected':'');
+    chip.innerHTML = `<div class="chip-name">${m.name}</div><div class="chip-meta"><span class="chip-badge" style="background:${m.bc}18;color:${m.bc};border:1px solid ${m.bc}30">${m.badge}</span><span class="chip-desc">${m.desc}</span></div>`;
+    chip.onclick = () => {
+      selectedModel[sec] = m.id;
+      strip.querySelectorAll('.model-chip').forEach(c => c.classList.remove('selected'));
+      chip.classList.add('selected');
+    };
+    strip.appendChild(chip);
+  });
+}
+
+// ─── PROMPT ──────────────────────────────────────────────────────────────────
+function onPromptInput(){
+  const v = document.getElementById('prompt-ta').value;
+  document.getElementById('prompt-count').textContent = v.length+'/3000';
+  updateGenBtn();
+}
+
+function fillExample(){
+  const exs = EXAMPLES[currentSection]||[];
+  document.getElementById('prompt-ta').value = exs[Math.floor(Math.random()*exs.length)]||'';
+  onPromptInput();
+}
+
+function updateGenBtn(){
+  const info = SECTIONS[currentSection];
+  const hasPrompt = info.noPrompt || !!document.getElementById('prompt-ta').value.trim();
+  const hasImg = !info.needImg || !!uploadedImageUrl;
+  const btn = document.getElementById('gen-btn');
+  btn.disabled = generating || !hasPrompt || !hasImg;
+  const icon = info.icon;
+  btn.textContent = generating ? 'Generando...' : `${icon} Generar`;
+}
+
+// ─── UPLOAD ───────────────────────────────────────────────────────────────────
+function handleFileInput(e){
+  const file = e.target.files[0]; if(!file) return;
+  readFile(file);
+}
+function handleDrop(e){
+  e.preventDefault();
+  document.getElementById('upload-zone').classList.remove('drag');
+  const file = e.dataTransfer.files[0]; if(!file||!file.type.startsWith('image/')) return;
+  readFile(file);
+}
+function readFile(file){
+  const reader = new FileReader();
+  reader.onload = ev => {
+    uploadedImageUrl = ev.target.result;
+    document.getElementById('upload-zone').style.display = 'none';
+    document.getElementById('upload-preview').style.display = 'block';
+    document.getElementById('upload-img').src = uploadedImageUrl;
+    updateGenBtn();
+  };
+  reader.readAsDataURL(file);
+}
+function clearUpload(){
+  uploadedImageUrl = null;
+  uploadedIsUrl = false;
+  document.getElementById('upload-zone').style.display = 'block';
+  document.getElementById('upload-preview').style.display = 'none';
+  document.getElementById('file-input').value = '';
+  const urlInput = document.getElementById('url-input');
+  if(urlInput) urlInput.value = '';
+  updateGenBtn();
+}
+
+// ─── GENERATE ────────────────────────────────────────────────────────────────
+async function generate(){
+  if(!apiKey){ openModal(); return; }
+  const info = SECTIONS[currentSection];
+  const prompt = document.getElementById('prompt-ta').value.trim();
+  const models = MODELS[currentSection]||[];
+  const modelId = selectedModel[currentSection]||models[0]?.id;
+  const model = models.find(m=>m.id===modelId)||models[0];
+  if(!model) return;
+
+  generating = true; updateGenBtn();
+  setResultLoading(); setProgress(10);
+
+  // Map of model IDs to their required image field name
+  const IMAGE_FIELDS = {
+    'flux-kontext-dev-i2i':'images_list','flux-kontext-pro-i2i':'images_list','flux-kontext-max-i2i':'images_list',
+    'gpt4o-image-to-image':'images_list','nano-banana-edit':'images_list','nano-banana-pro-edit':'images_list',
+    'nano-banana-2-edit':'images_list','bytedance-seedream-edit-v4':'images_list','qwen-image-edit-plus':'images_list',
+    'qwen-image-edit-plus-lora':'images_list','qwen-image-edit-2511':'images_list','wan2.5-image-edit':'images_list',
+    'wan2.6-image-edit':'images_list','kling-o1-edit-image':'images_list','flux-2-dev-edit':'images_list',
+    'flux-2-flex-edit':'images_list','flux-2-pro-edit':'images_list','flux-2-klein-4b-edit':'images_list',
+    'flux-2-klein-9b-edit':'images_list','vidu-q2-reference-to-image':'images_list','bytedance-seedream-v4.5-edit':'images_list',
+    'gpt-image-2-edit':'images_list','gpt-image-1.5-edit':'images_list','seedream-5.0-edit':'images_list',
+    'veo3-image-to-video':'images_list','veo3-fast-image-to-video':'images_list','pixverse-v4.5-i2v':'images_list',
+    'vidu-v2.0-i2v':'images_list','vidu-q1-reference':'images_list','pixverse-v5-i2v':'images_list',
+    'seedance-lite-reference-video':'images_list','wan2.1-reference-video':'images_list',
+    'openai-sora-2-image-to-video':'images_list','openai-sora-2-pro-image-to-video':'images_list',
+    'veo3.1-reference-to-video':'images_list','vidu-q2-reference':'images_list',
+    'grok-imagine-image-to-video':'images_list','kling-o1-reference-to-video':'images_list',
+    'pixverse-v5.5-i2v':'images_list','kling-o1-standard-reference-to-video':'images_list',
+    'seedance-v2.0-i2v':'images_list',
+    'ai-dress-change':'model_image_url','ai-product-photography':'person_image_url',
+  };
+
+  const body = {};
+  if(prompt) body.prompt = prompt;
+  if(uploadedImageUrl && info.needImg){
+    let imageUrlForAPI = uploadedImageUrl;
+    // If it's a base64 data URL, we need to upload it to get a real URL
+    if(uploadedImageUrl.startsWith('data:') && !uploadedIsUrl) {
+      try {
+        setResultLoading();
+        setLoadingText('Subiendo imagen...');
+        imageUrlForAPI = await uploadImageForAPI(uploadedImageUrl);
+      } catch(err) {
+        setResultError('Error subiendo imagen: ' + err.message + '<br><small>💡 Tip: usa el campo "O PEGA URL" con un enlace directo a la imagen</small>');
+        generating = false; updateGenBtn();
+        return;
+      }
     }
-  });
-}
-
-async function hfEdit(hf, prompt, imgData) {
-  const imgB64 = await toB64(imgData);
-  return hfCall(hf, {
-    inputs: prompt,
-    parameters: { image: imgB64 }
-  });
-}
-
-async function hfI2V(hf, prompt, imgData) {
-  const imgB64 = await toB64(imgData);
-  return hfCall(hf, {
-    inputs: imgB64,
-    parameters: { prompt, decode_chunk_size: 8 }
-  });
-}
-
-async function hfT2V(hf, prompt) {
-  return hfCall(hf, { inputs: prompt });
-}
-
-async function hfEnhance(hf, imgData, prompt) {
-  const imgB64 = await toB64(imgData);
-  // Caption/classify models just need the image
-  if (hf.includes('blip') || hf.includes('nsfw') || hf.includes('maskformer') || hf.includes('dpt') || hf.includes('Intel/dpt')) {
-    return hfCall(hf, { inputs: imgB64 });
+    const imgField = IMAGE_FIELDS[modelId] || 'image_url';
+    if(imgField === 'images_list') body.images_list = [imageUrlForAPI];
+    else body[imgField] = imageUrlForAPI;
   }
-  return hfCall(hf, { inputs: imgB64, parameters: prompt ? { prompt } : {} });
+  if(info.isVid){ body.aspect_ratio=currentVidRatio; body.duration=currentDuration; body.resolution=currentResolution; }
+  else if(!info.isAudio && !info.noPrompt){ body.aspect_ratio=currentImgRatio; }
+
+  try {
+    const res = await fetch(`https://api.muapi.ai/api/v1/${model.ep}`, {
+      method:'POST', headers:{'Content-Type':'application/json','x-api-key':apiKey},
+      body: JSON.stringify(body)
+    });
+    if(!res.ok){ const t=await res.text(); throw new Error(`Error ${res.status}: ${t.slice(0,120)}`); }
+    const data = await res.json();
+    const reqId = data.request_id || data.id;
+    if(!reqId) throw new Error('No se recibió request_id');
+
+    setProgress(30);
+    let attempts=0;
+    while(attempts<90){
+      await sleep(2500); attempts++;
+      setProgress(Math.min(92, 30+attempts*1.5));
+      const poll = await fetch(`https://api.muapi.ai/api/v1/predictions/${reqId}/result`,{headers:{'x-api-key':apiKey}});
+      const pd = await poll.json();
+      if(pd.status==='completed'||pd.status==='succeeded'){
+        const url = pd.url||pd.outputs?.[0]||pd.output?.[0];
+        if(!url) throw new Error('No URL en respuesta');
+        const type = info.isAudio ? 'audio' : (info.isVid||currentSection==='vfx') ? 'video' : 'image';
+        const item = {url,type,model:model.name,sec:currentSection,prompt,time:Date.now()};
+        setProgress(100);
+        setResultMedia(item);
+        addToHistory(item);
+        break;
+      } else if(pd.status==='failed'||pd.status==='error'){
+        throw new Error(pd.error||'La generación falló en el servidor');
+      }
+    }
+    if(attempts>=90) throw new Error('Tiempo de espera agotado (3.5 min)');
+  } catch(err){
+    setResultError(err.message);
+  } finally {
+    generating=false; updateGenBtn();
+    setTimeout(()=>{ document.getElementById('progress-bar-wrap').style.display='none'; },1200);
+  }
 }
 
-async function hfAudio(hf, prompt) {
-  return hfCall(hf, {
-    inputs: prompt,
-    parameters: { max_new_tokens: 512 }
-  });
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+// ─── RESULT ───────────────────────────────────────────────────────────────────
+function setProgress(pct){
+  progress=pct;
+  const wrap = document.getElementById('progress-bar-wrap');
+  const bar = document.getElementById('progress-bar');
+  wrap.style.display = 'block';
+  bar.style.width = pct+'%';
+  bar.style.background = `linear-gradient(90deg, ${SECTIONS[currentSection].color}, #6366f1)`;
+  // also update loading bar
+  const lb = document.getElementById('loading-bar');
+  if(lb){ lb.style.width=pct+'%'; lb.style.background=`linear-gradient(90deg, ${SECTIONS[currentSection].color}, #6366f1)`; }
+  const lp = document.getElementById('loading-pct');
+  if(lp) lp.textContent = Math.round(pct)+'%'+((['i2v','t2v'].includes(currentSection))?' · Videos toman 1-3 min':'');
 }
 
-async function toB64(imgData) {
-  if (imgData.type === 'data') return imgData.v.split(',')[1];
-  // URL - fetch and convert
-  const r = await fetch(imgData.v);
-  const buf = await r.arrayBuffer();
-  return btoa(String.fromCharCode(...new Uint8Array(buf)));
-}
-
-function sleep(ms) { return new Promise(r=>setTimeout(r,ms)); }
-
-// ── RESULT ────────────────────────────────────────────────────────────────────
-function showR() { document.getElementById('rp').classList.add('show'); }
-function closeR() { document.getElementById('rp').classList.remove('show'); }
-
-let progVal = 0;
-function setProgress(p) {
-  progVal = p;
-  const pb = document.getElementById('lpb');
-  const pt = document.getElementById('lpct');
-  if (pb) { pb.style.width=p+'%'; pb.style.background=`linear-gradient(90deg,${SEC_COLORS[curSec]},#6366f1)`; }
-  if (pt) pt.textContent = p+'%';
-}
-function setLoadTxt(t) { const el=document.getElementById('ltxt'); if(el) el.textContent=t; }
-
-function setLoading(txt) {
-  const c = SEC_COLORS[curSec];
-  document.getElementById('rscroll').innerHTML = `
-    <div class="lwrap">
-      <div class="spin" style="border-top-color:${c}"></div>
-      <div class="ltxt" id="ltxt">${txt}</div>
-      <div class="lbarw"><div id="lpb" class="lbar" style="width:10%;background:${c}"></div></div>
-      <div class="lpct" id="lpct">10%</div>
-      <div class="lhint">Si el modelo está frío puede tardar 1-2 min la primera vez</div>
+function setResultEmpty(){
+  const info = SECTIONS[currentSection];
+  document.getElementById('progress-bar-wrap').style.display='none';
+  document.getElementById('result-content').innerHTML = `
+    <div class="result-empty" id="empty-state">
+      <div class="result-empty-icon">${info.icon}</div>
+      <div class="result-empty-text">El resultado aparecerá aquí</div>
     </div>`;
 }
 
-function showRMedia(item) {
-  document.getElementById('rmodel').textContent = item.model;
+function setLoadingText(txt){
+  const el = document.querySelector('.loading-wrap div[style*="color:var(--tx2"]');
+  if(el) el.textContent = txt;
+  // Also update the processing text
+  const all = document.querySelectorAll('.loading-wrap div');
+  all.forEach(d => { if(d.textContent.includes('Procesando')) d.textContent = txt; });
+}
+function setResultLoading(){
+  const info = SECTIONS[currentSection];
+  document.getElementById('result-content').innerHTML = `
+    <div class="loading-wrap">
+      <div class="spinner" style="border-top-color:${info.color}"></div>
+      <div style="color:var(--tx2);font-size:13px">Procesando...</div>
+      <div class="loading-bar-wrap"><div id="loading-bar" class="loading-bar" style="width:10%"></div></div>
+      <div id="loading-pct" class="loading-pct">10%</div>
+    </div>`;
+}
+
+function setResultError(msg){
+  document.getElementById('result-content').innerHTML = `
+    <div class="result-error">
+      <div style="font-size:36px">⚠</div>
+      <div style="color:var(--r);font-weight:600">Error al generar</div>
+      <div style="color:var(--tx3);font-size:12px;max-width:280px">${msg}</div>
+    </div>`;
+}
+
+function setResultMedia(item){
   let media = '';
-  if (item.type === 'video') {
-    media = `<video class="rvid" src="${item.url}" controls autoplay loop playsinline></video>`;
-  } else if (item.type === 'audio') {
-    media = `<div class="raudio"><div style="font-size:28px">🎵</div><audio src="${item.url}" controls style="flex:1"></audio></div>`;
+  if(item.type==='video'){
+    media = `<video src="${item.url}" controls autoplay loop style="width:100%;max-height:460px;object-fit:contain;border-radius:12px;background:#000"></video>`;
+  } else if(item.type==='audio'){
+    media = `<div class="result-audio-wrap"><div style="font-size:30px">♪</div><audio src="${item.url}" controls style="flex:1;height:38px"></audio></div>`;
   } else {
-    media = `<img class="rimg" src="${item.url}" alt="Generated" onclick="window.open('${item.url}','_blank')">`;
+    media = `<img src="${item.url}" alt="result" style="width:100%;max-height:460px;object-fit:contain;border-radius:12px;background:#000">`;
   }
-  document.getElementById('rscroll').innerHTML = `
-    <div style="animation:fadeUp .3s ease;display:flex;flex-direction:column;gap:10px">
+  document.getElementById('result-content').innerHTML = `
+    <div class="result-media">
       ${media}
-      <div class="rbtn-row">
-        <a href="${item.url}" download="opengenstudio.${item.type==='audio'?'mp3':item.type==='video'?'mp4':'png'}" class="rbtn">↓ Descargar</a>
-        <button class="rbtn" onclick="reusePrompt('${item.sec}','${encodeURIComponent(item.prompt||'')}')">↺ Reusar</button>
-      </div>
-      ${item.prompt ? `<div class="rprompt-card">"${item.prompt.slice(0,200)}"</div>` : ''}
+      <a href="${item.url}" target="_blank" download class="result-dl">↓ Descargar ${item.type==='video'?'video':item.type==='audio'?'audio':'imagen'}</a>
     </div>`;
 }
 
-function showRErr(msg) {
-  document.getElementById('rscroll').innerHTML = `
-    <div class="ewrap">
-      <div class="eicon">⚠️</div>
-      <div class="etitle">Error</div>
-      <div class="emsg">${msg}</div>
-      <button class="eback" onclick="closeR()">← Volver</button>
-    </div>`;
+// ─── HISTORY ─────────────────────────────────────────────────────────────────
+function addToHistory(item){
+  history.unshift(item);
+  document.getElementById('hist-count').textContent = history.length;
+  document.getElementById('hist-count2').textContent = history.length;
+  renderHistory();
 }
 
-function reusePrompt(sec, encodedPrompt) {
-  const p = decodeURIComponent(encodedPrompt);
-  const ta = document.getElementById('p-'+sec);
-  if (ta) { ta.value = p; onPI(sec); }
-  closeR();
-  go(sec);
-}
-
-// ── HISTORY ───────────────────────────────────────────────────────────────────
-function addHist(item) {
-  const save = { ...item };
-  delete save.blob;
-  history.unshift(save);
-  if (history.length > 30) history = history.slice(0,30);
-  try { localStorage.setItem('og_history', JSON.stringify(history.map(h=>({...h,url:h.type==='image'?h.url:null})))); } catch(e){}
-  updateHCount();
-  renderHist();
-}
-function updateHCount() { document.getElementById('hcount').textContent = history.length; }
-function toggleHist() {
-  const hs = document.getElementById('hs');
-  if (hs.classList.contains('active')) {
-    hs.classList.remove('active');
-    go(curSec);
-  } else {
-    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-    hs.classList.add('active');
-    renderHist();
-  }
-}
-function renderHist() {
-  const g = document.getElementById('hgrid');
-  if (!history.length) { g.innerHTML='<div class="hempty">Sin historial aún</div>'; return; }
-  g.innerHTML = history.map((item,i) => {
-    const th = item.type==='image' && item.url ? `<img src="${item.url}" alt="" loading="lazy">` : `<div class="hph">${item.type==='audio'?'🎵':'🎬'}</div>`;
-    return `<div class="hitem" onclick="viewHist(${i})">${th}<div class="hlbl">${item.model||''}</div></div>`;
+function renderHistory(){
+  const list = document.getElementById('hist-list');
+  if(history.length===0){ list.innerHTML='<div class="hist-empty">Sin historial aún</div>'; return; }
+  list.innerHTML = history.map((item,i) => {
+    const thumb = item.type==='image'
+      ? `<img src="${item.url}" alt="">`
+      : `<div class="hist-item-placeholder">${item.type==='audio'?'♪':'▶'}</div>`;
+    return `<div class="hist-item ${historySelectedIdx===i?'selected':''}" onclick="selectHistory(${i})">${thumb}<div class="hist-item-label">${item.model}</div></div>`;
   }).join('');
 }
-function viewHist(i) {
-  const item = history[i];
-  showR();
-  showRMedia(item);
+
+function selectHistory(i){
+  historySelectedIdx = i;
+  setResultMedia(history[i]);
+  renderHistory();
 }
 
-// ── MODAL ─────────────────────────────────────────────────────────────────────
-function openModal() {
-  document.getElementById('mo').classList.remove('hidden');
-  document.getElementById('mdi').value = '';
-  document.getElementById('mdok').disabled = true;
-  document.getElementById('mddel').style.display = hfKey ? 'block' : 'none';
-  setTimeout(()=>document.getElementById('mdi').focus(),100);
+function toggleHistory(){
+  showingHistory = !showingHistory;
+  document.getElementById('hist-panel').style.display = showingHistory ? 'flex' : 'none';
+  document.getElementById('hist-panel').style.flexDirection = 'column';
+  const btn = document.getElementById('hist-toggle-btn');
+  btn.classList.toggle('hist-on', showingHistory);
 }
-function closeModal() { document.getElementById('mo').classList.add('hidden'); }
-function saveKey() {
-  const v = document.getElementById('mdi').value.trim();
-  if (!v) return;
-  hfKey = v;
-  localStorage.setItem('hf_key', v);
-  updateKeyBtn();
-  closeModal();
-  Object.keys(MODELS).forEach(s=>updateBtn(s));
+
+// ─── MODAL ────────────────────────────────────────────────────────────────────
+function openModal(){
+  document.getElementById('modal-overlay').classList.remove('hidden');
+  document.getElementById('modal-input').value = '';
+  document.getElementById('modal-confirm').disabled = true;
+  document.getElementById('modal-del').style.display = apiKey ? 'block' : 'none';
+  setTimeout(()=>document.getElementById('modal-input').focus(), 50);
 }
-function delKey() {
-  hfKey = '';
-  localStorage.removeItem('hf_key');
-  updateKeyBtn();
-  closeModal();
+function closeModal(){ document.getElementById('modal-overlay').classList.add('hidden'); }
+function saveKey(){
+  const v = document.getElementById('modal-input').value.trim();
+  if(!v) return;
+  apiKey = v;
+  document.getElementById('key-btn').textContent = '✓ Key';
+  document.getElementById('key-btn').className = 'top-btn key-ok';
+  closeModal(); updateGenBtn();
 }
-function updateKeyBtn() {
-  const btn = document.getElementById('key-btn');
-  if (hfKey) { btn.textContent='✓ HF Key'; btn.className='top-btn ok'; }
-  else { btn.textContent='⚠ HF Key'; btn.className='top-btn err'; }
+function deleteKey(){
+  apiKey='';
+  document.getElementById('key-btn').textContent = '⚠ API Key';
+  document.getElementById('key-btn').className = 'top-btn key-err';
+  closeModal(); updateGenBtn();
 }
-document.getElementById('mo').addEventListener('click', e=>{ if(e.target===document.getElementById('mo')) closeModal(); });
+document.getElementById('modal-overlay').addEventListener('click', e => { if(e.target===document.getElementById('modal-overlay')) closeModal(); });
+document.getElementById('modal-input').addEventListener('keydown', e => { if(e.key==='Enter' && apiKey) saveKey(); });
 </script>
 </body>
 </html>
