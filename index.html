@@ -445,7 +445,10 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'DM Sans'
   <div id="modal">
     <div class="modal-handle"></div>
     <div class="modal-title">API Key de MuAPI</div>
-    <div class="modal-sub">Obtén tu key en <a href="https://muapi.ai" target="_blank">muapi.ai</a> para desbloquear todos los modelos.</div>
+    <div class="modal-sub">
+      <strong style="color:var(--g)">🆓 Gratis:</strong> Token de <a href="https://huggingface.co/settings/tokens" target="_blank" style="color:var(--g)">Hugging Face</a> (hf_...) para modelos FLUX, SDXL y más.<br><br>
+      <strong style="color:var(--c)">💳 Premium:</strong> Key de <a href="https://muapi.ai" target="_blank">muapi.ai</a> para video, audio y modelos avanzados.
+    </div>
     <input id="modal-input" class="modal-input" type="password" placeholder="mua_xxxxxxxxxxxx" autocomplete="off" oninput="document.getElementById('modal-confirm').disabled=!this.value.trim()">
     <div class="modal-btns">
       <button class="modal-btn cancel" onclick="closeModal()">Cancelar</button>
@@ -483,10 +486,37 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'DM Sans'
 <script>
 const PROXY = 'https://corsproxy.io/?url=';
 const API = 'https://api.muapi.ai/api/v1';
+const HF_API = 'https://api-inference.huggingface.co/models';
+
+// HuggingFace free models by section
+const HF_MODELS = {
+  t2i: [
+    {id:'flux-schnell-hf',   name:'FLUX.1 Schnell', model:'black-forest-labs/FLUX.1-schnell', badge:'Free⚡',bc:'#22d3ee',desc:'Más rápido, gratis'},
+    {id:'flux-dev-hf',       name:'FLUX.1 Dev',     model:'black-forest-labs/FLUX.1-dev',     badge:'Free HQ',bc:'#60a5fa',desc:'Alta calidad, gratis'},
+    {id:'sdxl-hf',           name:'SDXL Base',      model:'stabilityai/stable-diffusion-xl-base-1.0', badge:'Free',bc:'#a78bfa',desc:'SDXL gratis'},
+    {id:'sdxl-turbo-hf',     name:'SDXL Turbo',     model:'stabilityai/sdxl-turbo',           badge:'Free⚡',bc:'#34d399',desc:'Ultra rápido'},
+    {id:'dreamshaper-hf',    name:'DreamShaper XL',  model:'Lykon/dreamshaper-xl-turbo',       badge:'Free',bc:'#f472b6',desc:'Artístico'},
+    {id:'realvis-hf',        name:'RealVisXL v4',    model:'SG161222/RealVisXL_V4.0',          badge:'Free',bc:'#fb923c',desc:'Fotorrealista'},
+    {id:'playground-hf',     name:'Playground v2.5', model:'playgroundai/playground-v2.5-1024px-aesthetic', badge:'Free',bc:'#8b5cf6',desc:'Estético'},
+    {id:'animagine-hf',      name:'Animagine XL 3',  model:'cagliostrolab/animagine-xl-3.0',   badge:'Free',bc:'#f43f5e',desc:'Anime'},
+    {id:'juggernaut-hf',     name:'Juggernaut XL',   model:'RunDiffusion/Juggernaut-XL-v9',    badge:'Free',bc:'#fbbf24',desc:'Fotorrealista'},
+    {id:'flux-merged-hf',    name:'FLUX Merged',     model:'enhanceaiteam/Flux-Uncensored-V2', badge:'Free',bc:'#14b8a6',desc:'Versátil'},
+  ],
+};
 
 // ── MODELS ───────────────────────────────────────────────────────────────────
 const MODELS = {
   t2i:[
+    // --- GRATIS (Hugging Face) ---
+    {id:'flux-schnell-hf',hf:true,name:'FLUX Schnell',badge:'🆓⚡',bc:'#22d3ee',desc:'Gratis · Rápido'},
+    {id:'flux-dev-hf',hf:true,name:'FLUX Dev',badge:'🆓 HQ',bc:'#60a5fa',desc:'Gratis · Alta calidad'},
+    {id:'sdxl-hf',hf:true,name:'SDXL Base',badge:'🆓',bc:'#a78bfa',desc:'Gratis · Clásico'},
+    {id:'sdxl-turbo-hf',hf:true,name:'SDXL Turbo',badge:'🆓⚡',bc:'#34d399',desc:'Gratis · Ultra rápido'},
+    {id:'dreamshaper-hf',hf:true,name:'DreamShaper XL',badge:'🆓',bc:'#f472b6',desc:'Gratis · Artístico'},
+    {id:'realvis-hf',hf:true,name:'RealVisXL v4',badge:'🆓',bc:'#fb923c',desc:'Gratis · Fotorrealista'},
+    {id:'playground-hf',hf:true,name:'Playground 2.5',badge:'🆓',bc:'#8b5cf6',desc:'Gratis · Estético'},
+    {id:'animagine-hf',hf:true,name:'Animagine XL',badge:'🆓',bc:'#f43f5e',desc:'Gratis · Anime'},
+    // --- MUAPI (requiere créditos) ---
     {id:'flux-schnell',ep:'flux-schnell-image',name:'Flux Schnell',badge:'Fast',bc:'#22d3ee',desc:'Ultra-rápido'},
     {id:'flux-dev',ep:'flux-dev-image',name:'Flux Dev',badge:'HQ',bc:'#60a5fa',desc:'Alta calidad'},
     {id:'flux-kontext-pro-t2i',ep:'flux-kontext-pro',name:'Flux Kontext Pro',badge:'Pro',bc:'#a78bfa',desc:'Contexto'},
@@ -906,6 +936,71 @@ async function generate() {
     setLoadingTxt('Enviando a '+model.name+'...');
     setProgress(15);
 
+    // ── Hugging Face free path ────────────────────────────────────────────
+    if (model.hf) {
+      if (!apiKey) { closeResult(); openModal(); return; }
+      const hfModel = HF_MODELS.t2i.find(m => m.id === model.id);
+      if (!hfModel) throw new Error('Modelo HF no encontrado');
+      setLoadingTxt('Generando con '+model.name+' (gratis)...');
+      setProgress(20);
+
+      const hfUrl = `${HF_API}/${hfModel.model}`;
+      const hfBody = { inputs: prompt, parameters: { guidance_scale: 7.5 } };
+
+      // HF can return the image directly (blob) or a URL
+      let attempts = 0;
+      let imageBlob = null;
+      while (attempts < 20) {
+        attempts++;
+        setProgress(20 + attempts * 3);
+        const hfRes = await fetch(
+          `${PROXY}${encodeURIComponent(hfUrl)}`,
+          { method:'POST', headers:{'Authorization':'Bearer '+apiKey,'Content-Type':'application/json'}, body:JSON.stringify(hfBody) }
+        );
+        if (hfRes.status === 503) {
+          // Model loading
+          const errData = await hfRes.json().catch(()=>({}));
+          const wait = errData.estimated_time || 20;
+          setLoadingTxt(`Cargando modelo... ~${Math.round(wait)}s`);
+          await sleep(Math.min(wait * 1000, 15000));
+          continue;
+        }
+        if (!hfRes.ok) {
+          const t = await hfRes.text();
+          throw new Error(`HF Error ${hfRes.status}: ${t.slice(0,120)}`);
+        }
+        const contentType = hfRes.headers.get('content-type') || '';
+        if (contentType.includes('image')) {
+          imageBlob = await hfRes.blob();
+          break;
+        } else {
+          const data = await hfRes.json();
+          // Some models return URL
+          const url = data[0]?.url || data.url || data[0];
+          if (typeof url === 'string' && url.startsWith('http')) {
+            const item = {url, type:'image', model:model.name, sec, prompt, time:Date.now()};
+            setProgress(100);
+            showResultMedia(item);
+            addHistory(item);
+            generating = false; updateGenBtn();
+            return;
+          }
+          throw new Error('Respuesta inesperada de HF: '+JSON.stringify(data).slice(0,100));
+        }
+      }
+      if (!imageBlob) throw new Error('No se pudo generar la imagen');
+
+      // Convert blob to object URL
+      const objectUrl = URL.createObjectURL(imageBlob);
+      const item = {url:objectUrl, type:'image', model:model.name, sec, prompt, time:Date.now(), isBlob:true};
+      setProgress(100);
+      showResultMedia(item);
+      addHistory(item);
+      generating = false; updateGenBtn();
+      return;
+    }
+
+    // ── MuAPI paid path ───────────────────────────────────────────────────
     const submitRes = await apiFetch(model.ep, 'POST', body);
     if (!submitRes.ok) {
       const t = await submitRes.text();
@@ -1121,7 +1216,8 @@ function saveKey() {
   if (!v) return;
   apiKey = v;
   const btn = document.getElementById('key-btn');
-  btn.textContent = '✓ Key';
+  const isHF = v.startsWith('hf_');
+  btn.textContent = isHF ? '🆓 HF' : '✓ Key';
   btn.className = 'top-btn ok';
   closeModal(); updateGenBtn();
 }
