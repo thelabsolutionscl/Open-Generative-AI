@@ -1,0 +1,37 @@
+name: OpenGen audit
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'tests/opengen-wiring.test.js'
+      - '.github/workflows/opengen-audit.yml'
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'tests/opengen-wiring.test.js'
+      - '.github/workflows/opengen-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  visual-generation-flow:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate test syntax
+        run: node --check tests/opengen-wiring.test.js
+
+      - name: Audit OpenGen wiring
+        run: node --test tests/opengen-wiring.test.js
