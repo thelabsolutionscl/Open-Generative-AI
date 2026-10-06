@@ -553,7 +553,6 @@ function handleUrlInput(val) {
   document.getElementById('upload-img').src=safe;updateGenBtn();
 }
 
-document.addEventListener('DOMContentLoaded'
 document.addEventListener('DOMContentLoaded', () => {
   buildPills();
   switchSection('t2i');
@@ -913,7 +912,6 @@ function renderHistory(){
     const label=document.createElement('div');label.className='hist-item-label';label.textContent=String(item.model||'Resultado').slice(0,120);row.appendChild(label);list.appendChild(row);
   });
 }
-function selectHistory(i){
 function selectHistory(i){
   historySelectedIdx = i;
   setResultMedia(history[i]);
