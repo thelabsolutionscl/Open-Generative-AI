@@ -48,6 +48,7 @@ test('credencial, prompts e imágenes ya no salen a corsproxy ni al proveedor de
   assert.match(upload,/hostRpc\(\s*['"]upload['"]/);
   assert.match(gen,/hostRpc\(\s*['"]generate['"]/);
   assert.match(gen,/hostRpc\(\s*['"]poll['"]/);
+  assert.match(functionBlock('hostRpc'),/https:\/\/proxy\.thelab\.solutions\/visual-ai\/rpc/);
 });
 
 test('postMessage está versionado y limitado al dashboard exacto',()=>{
@@ -137,7 +138,7 @@ test('historial está declarado como temporal de sesión',()=>{
 
 test('OpenGen aplica CSP, Referrer-Policy y Permissions-Policy',()=>{
   assert.match(HTML,/Content-Security-Policy/);
-  assert.match(HTML,/connect-src 'none'/);
+  assert.match(HTML,/connect-src https:\/\/proxy\.thelab\.solutions/);
   assert.match(HTML,/object-src 'none'/);
   assert.match(HTML,/name=["']referrer["'][^>]*no-referrer/);
   assert.match(HTML,/Permissions-Policy/);
