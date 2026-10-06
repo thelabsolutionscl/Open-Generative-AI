@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="referrer" content="no-referrer">
 <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=(), usb=()">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src https: blob:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src https: blob:; connect-src https://proxy.thelab.solutions; object-src 'none'; base-uri 'none'; form-action 'none'">
 <title>OpenGen Studio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -477,8 +477,29 @@ function allowedInputUrl(value){
   const safe=safeHttpsUrl(value);if(!safe)return null;
   return /\.(?:jpe?g|png|webp)$/i.test(new URL(safe).pathname)?safe:null;
 }
-function hostRpc(action,payload={},signal){
-  if(!hostReady||window.parent===window)return Promise.reject(new Error('OpenGen debe abrirse dentro del dashboard autenticado'));
+async function hostRpc(action,payload={},signal){
+  if(window.parent===window){
+    const ctrl=new AbortController();
+    const abort=()=>ctrl.abort();
+    if(signal){
+      if(signal.aborted){const e=new Error('Generación cancelada');e.name='AbortError';throw e;}
+      signal.addEventListener('abort',abort,{once:true});
+    }
+    const timer=setTimeout(()=>ctrl.abort(),50000);
+    try{
+      const r=await fetch('https://proxy.thelab.solutions/visual-ai/rpc',{
+        method:'POST',credentials:'include',redirect:'error',signal:ctrl.signal,
+        headers:{'Content-Type':'application/json'},body:JSON.stringify({action,...payload})
+      });
+      const data=await r.json().catch(()=>({error:'Respuesta inválida del proxy TLS'}));
+      if(!r.ok){const e=new Error(data.error||('Error del backend ('+r.status+')'));e.status=r.status;e.code=data.code||'';e.transient=!!data.transient;throw e;}
+      return data;
+    }finally{
+      clearTimeout(timer);
+      if(signal)signal.removeEventListener('abort',abort);
+    }
+  }
+  if(!hostReady)return Promise.reject(new Error('El dashboard todavía no confirmó el canal seguro'));
   const requestId='rpc_'+Date.now().toString(36)+'_'+(++rpcSeq).toString(36);
   return new Promise((resolve,reject)=>{
     const timer=setTimeout(()=>{rpcPending.delete(requestId);reject(new Error('El dashboard no respondió a tiempo'));},50000);
@@ -559,8 +580,22 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('prompt-ta').addEventListener('input', onPromptInput);
   document.getElementById('prompt-ta').addEventListener('keydown', e => { if(e.key==='Enter' && (e.metaKey||e.ctrlKey)) generate(); });
   document.getElementById('rights-confirm')?.addEventListener('change',updateGenBtn);
-  announceReady();
-  setTimeout(announceReady,500);
+  if(window.parent===window){
+    const key=document.getElementById('key-btn'),cap=document.getElementById('cost-status');
+    if(key)key.textContent='🔒 Conectando Access…';
+    hostRpc('quota',{}).then(q=>{
+      hostReady=true;
+      if(key){key.textContent='🔒 Backend seguro';key.className='top-btn key-ok';}
+      if(cap)cap.textContent='Cuota diaria segura: '+(q.daily_limit||'—')+' generaciones';
+      updateGenBtn();
+    }).catch(err=>{
+      if(key){key.textContent='⚠ Abre sesión en dashboard';key.className='top-btn key-err';}
+      if(cap)cap.textContent='No se pudo validar Cloudflare Access: '+String(err.message||err).slice(0,100);
+    });
+  }else{
+    announceReady();
+    setTimeout(announceReady,500);
+  }
 });
 
 function buildPills(){
