@@ -7,7 +7,7 @@ const fs=require('node:fs');
 const path=require('node:path');
 const HTML=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
 
-function esc(value){return String(value).replace(/[.*+?^$()|[\]\\]/g,'\\$&');}
+function esc(value){return String(value).replace(/[.*+?^$()|[\]\\]/g,'\\function esc(value){return String(value).replace(/[.*+?^$()|[\]\\]/g,'\\$&');}');}
 function count(re){return(HTML.match(re)||[]).length;}
 function functionBlock(name){
   const re=new RegExp('(?:async\\s+)?function\\s+'+esc(name)+'\\s*\\(');
@@ -20,11 +20,11 @@ function unique(name){assert.equal(count(new RegExp('(?:async\\s+)?function\\s+'
 
 test('OpenGen conserva las siete herramientas y controles operativos',()=>{
   for(const sec of ['t2i','edit','i2v','t2v','vfx','audio','upscale']){
-    assert.match(HTML,new RegExp('data-sec=["\\\']'+sec+'["\\\']'));
+    assert.ok(HTML.includes('data-sec="'+sec+'"')||HTML.includes("data-sec='"+sec+"'"),'falta sección '+sec);
     assert.match(HTML,new RegExp('\\b'+sec+'\\s*:\\s*\\['));
   }
   for(const id of ['gen-btn','prompt-ta','upload-zone','file-input','url-input','result-content','hist-panel','hist-list','rights-confirm','cost-status','key-btn'])
-    assert.equal(count(new RegExp('id=["\\\']'+id+'["\\\']','g')),1,id);
+    assert.equal((HTML.match(new RegExp('id=(?:"|\\x27)'+id+'(?:"|\\x27)','g'))||[]).length,1,id);
   assert.doesNotMatch(HTML,/id=["']modal-input["']|API Key de MuAPI/);
 });
 
