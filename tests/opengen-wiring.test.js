@@ -19,9 +19,9 @@ function functionBlock(name){
 function unique(name){assert.equal(count(new RegExp('(?:async\\s+)?function\\s+'+esc(name)+'\\s*\\(','g')),1,name+' debe existir una vez');}
 
 test('JavaScript inline de OpenGen mantiene sintaxis válida',()=>{
-  const scripts=[...HTML.matchAll(/<script>([\\s\\S]*?)<\\/script>/g)];
+  const scripts=HTML.split('<script>').slice(1).map(part=>part.split('</script>')[0]);
   assert.ok(scripts.length,'falta script principal');
-  for(const [,code] of scripts)assert.doesNotThrow(()=>new Function(code));
+  for(const code of scripts)assert.doesNotThrow(()=>new Function(code));
 });
 
 test('OpenGen conserva las siete herramientas y controles operativos',()=>{
