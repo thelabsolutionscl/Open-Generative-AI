@@ -58,7 +58,7 @@ test('postMessage está versionado y limitado al dashboard exacto',()=>{
   assert.match(HTML,/event\.source!==window\.parent/);
   assert.match(HTML,/source:'opengen'/);
   assert.match(HTML,/source!==['"]tls-dashboard['"]/);
-  assert.match(HTML,/type:['"]ready['"]/);
+  assert.match(functionBlock('announceReady'),/postHost\(\s*['"]ready['"]/);
   assert.match(HTML,/job-start|job-progress|job-complete|job-error|asset-selected/);
 });
 
