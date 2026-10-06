@@ -7,7 +7,7 @@ const fs=require('node:fs');
 const path=require('node:path');
 const HTML=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
 
-function esc(value){return String(value).replace(/[.*+?^$()|[\]\\]/g,'\\function esc(value){return String(value).replace(/[.*+?^$()|[\]\\]/g,'\\$&');}');}
+function esc(value){return String(value).replace(/[.*+?^$()|[\]\\]/g,'\\$&');}
 function count(re){return(HTML.match(re)||[]).length;}
 function functionBlock(name){
   const re=new RegExp('(?:async\\s+)?function\\s+'+esc(name)+'\\s*\\(');
