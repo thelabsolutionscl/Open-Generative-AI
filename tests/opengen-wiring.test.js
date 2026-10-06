@@ -18,6 +18,12 @@ function functionBlock(name){
 }
 function unique(name){assert.equal(count(new RegExp('(?:async\\s+)?function\\s+'+esc(name)+'\\s*\\(','g')),1,name+' debe existir una vez');}
 
+test('JavaScript inline de OpenGen mantiene sintaxis válida',()=>{
+  const scripts=[...HTML.matchAll(/<script>([\\s\\S]*?)<\\/script>/g)];
+  assert.ok(scripts.length,'falta script principal');
+  for(const [,code] of scripts)assert.doesNotThrow(()=>new Function(code));
+});
+
 test('OpenGen conserva las siete herramientas y controles operativos',()=>{
   for(const sec of ['t2i','edit','i2v','t2v','vfx','audio','upscale']){
     assert.ok(HTML.includes('data-sec="'+sec+'"')||HTML.includes("data-sec='"+sec+"'"),'falta sección '+sec);
