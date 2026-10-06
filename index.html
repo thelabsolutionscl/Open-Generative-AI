@@ -522,7 +522,7 @@ window.addEventListener('message',event=>{
     if(key){key.textContent='🔒 Backend seguro';key.className='top-btn key-ok';}
     const cap=document.getElementById('cost-status');
     if(cap)cap.textContent='Backend TLS activo · consultando cuota…';
-    hostRpc('quota',{}).then(q=>{if(cap)cap.textContent='Cuota diaria segura: '+(q.daily_limit||'—')+' generaciones';}).catch(()=>{});
+    hostRpc('quota',{}).then(q=>{if(cap)cap.textContent='Cuota: '+(q.used??'—')+'/'+(q.daily_limit||'—')+' usadas · '+(q.remaining??'—')+' restantes · costo previo no disponible';}).catch(()=>{});
     updateGenBtn();return;
   }
   if(msg.type==='pause'){currentJobController?.abort();return;}
@@ -586,7 +586,7 @@ document.addEventListener('DOMContentLoaded', () => {
     hostRpc('quota',{}).then(q=>{
       hostReady=true;
       if(key){key.textContent='🔒 Backend seguro';key.className='top-btn key-ok';}
-      if(cap)cap.textContent='Cuota diaria segura: '+(q.daily_limit||'—')+' generaciones';
+      if(cap)cap.textContent='Cuota: '+(q.used??'—')+'/'+(q.daily_limit||'—')+' usadas · '+(q.remaining??'—')+' restantes · costo previo no disponible';
       updateGenBtn();
     }).catch(err=>{
       if(key){key.textContent='⚠ Abre sesión en dashboard';key.className='top-btn key-err';}
