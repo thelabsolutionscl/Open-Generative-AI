@@ -112,8 +112,10 @@ test('resultados y errores remotos se construyen con DOM seguro',()=>{
 
 test('cuota, duración/costo y confirmación de operaciones costosas son visibles',()=>{
   const gen=functionBlock('generate'),media=functionBlock('setResultMedia');
-  assert.match(HTML,/Cuota diaria segura/);
+  assert.match(HTML,/Cuota: .*usadas.*restantes.*costo previo no disponible/s);
   assert.match(gen,/created\.quota/);
+  assert.match(HTML,/hostRpc\(\s*['"]quota['"]/);
+  assert.doesNotMatch(HTML,/costo estimado\s*US\$\s*\d/i);
   assert.match(gen,/info\.isVid\|\|info\.isAudio/);
   assert.match(gen,/confirm\(/);
   assert.match(media,/Generado en/);
