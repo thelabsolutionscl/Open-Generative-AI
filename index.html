@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=(), usb=()">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src https: blob:; connect-src https://proxy.thelab.solutions; object-src 'none'; base-uri 'none'; form-action 'none'">
 <title>OpenGen Studio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -174,7 +177,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   </div>
   <div id="topbar-right">
     <button class="top-btn" id="hist-toggle-btn" onclick="toggleHistory()">◷ <span id="hist-count">0</span></button>
-    <button class="top-btn key-err" id="key-btn" onclick="openModal()">⚠ API Key</button>
+    <button class="top-btn key-err" id="key-btn" type="button" disabled>🔒 Esperando dashboard</button>
   </div>
 </div>
 
@@ -259,7 +262,12 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     </div><!-- /left-scroll -->
 
     <div class="left-footer">
-      <button id="gen-btn" onclick="generate()" disabled>✦ Generar</button>
+      <label style="display:flex;gap:7px;align-items:flex-start;font-size:10px;color:var(--tx3);line-height:1.35;margin-bottom:8px;cursor:pointer">
+        <input id="rights-confirm" type="checkbox" style="margin-top:2px">
+        <span>Confirmo que tengo permiso para usar el material, rostro o voz enviado y que revisaré el resultado antes de publicarlo.</span>
+      </label>
+      <div id="cost-status" style="font-size:9px;color:var(--tx3);font-family:'DM Mono',monospace;margin-bottom:7px">Cuota segura: esperando dashboard</div>
+      <button id="gen-btn" onclick="generating?cancelGeneration():generate()" disabled>✦ Generar</button>
     </div>
   </div><!-- /left -->
 
@@ -290,25 +298,11 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
   <!-- HISTORY (hidden by default) -->
   <div id="hist-panel" style="display:none">
-    <div id="hist-head">Historial · <span id="hist-count2">0</span></div>
+    <div id="hist-head">Historial de esta sesión · <span id="hist-count2">0</span></div>
     <div id="hist-list"><div class="hist-empty">Sin historial aún</div></div>
   </div>
 
 </div><!-- /main -->
-
-<!-- API KEY MODAL -->
-<div id="modal-overlay" class="hidden">
-  <div id="modal">
-    <div class="modal-title">API Key de MuAPI</div>
-    <div class="modal-sub">Obtén tu key en <a href="https://muapi.ai" target="_blank">muapi.ai</a> para desbloquear todos los modelos de imagen, video y audio.</div>
-    <input id="modal-input" class="modal-input" type="password" placeholder="mua_xxxxxxxxxxxx" autocomplete="off">
-    <div class="modal-btns">
-      <button class="modal-btn cancel" onclick="closeModal()">Cancelar</button>
-      <button class="modal-btn confirm" id="modal-confirm" onclick="saveKey()" disabled>Guardar</button>
-    </div>
-    <button class="modal-btn-del" id="modal-del" style="display:none" onclick="deleteKey()">Eliminar key guardada</button>
-  </div>
-</div>
 
 <script>
 // ─── DATA ───────────────────────────────────────────────────────────────────
@@ -436,7 +430,6 @@ const EXAMPLES = {
 };
 
 // ─── STATE ───────────────────────────────────────────────────────────────────
-let apiKey = '';
 let currentSection = 't2i';
 let selectedModel = {};
 let uploadedImageUrl = null;
@@ -458,44 +451,96 @@ let currentDuration = 5;
 let currentResolution = '720p';
 
 
-// ─── IMGBB UPLOAD ─────────────────────────────────────────────────────────────
-async function uploadToImgbb(base64DataUrl) {
-  // Strip the data:image/xxx;base64, prefix
-  const base64 = base64DataUrl.split(',')[1];
-  const formData = new FormData();
-  formData.append('image', base64);
-  // Use imgbb free API (no key needed for anonymous uploads, 32MB limit)
-  const res = await fetch('https://api.imgbb.com/1/upload?key=temp_free&expiration=600', {
-    method: 'POST',
-    body: formData
-  });
-  // If imgbb fails, fallback to freeimage.host
-  if (!res.ok) throw new Error('Upload fallback needed');
-  const data = await res.json();
-  return data.data.url;
+// ─── SECURE HOST BRIDGE / UPLOAD ──────────────────────────────────────────────
+const HOST_ORIGIN='https://dashboard.thelab.solutions';
+const PROTOCOL_VERSION=1;
+const RESULT_HOST_SUFFIXES=['muapi.ai','fal.media','replicate.delivery','cloudfront.net','amazonaws.com'];
+const rpcPending=new Map();
+let rpcSeq=0,hostReady=false,currentJobController=null;
+
+function postHost(type,payload={}){
+  if(window.parent===window)return;
+  window.parent.postMessage({source:'opengen',version:PROTOCOL_VERSION,type,...payload},HOST_ORIGIN);
 }
-
-async function uploadImageForAPI(base64DataUrl) {
-  // Compress first to reduce file size
-  const compressed = await compressImage(base64DataUrl, 1280, 0.88);
-  const blob = await fetch(compressed).then(r => r.blob());
-  const file = new File([blob], 'image.jpg', { type: 'image/jpeg' });
-
-  // Use MuAPI's own upload endpoint — returns URLs already in their allowlist
-  const fd = new FormData();
-  fd.append('file', file);
-  const res = await fetch('https://corsproxy.io/?url=' + encodeURIComponent('https://api.muapi.ai/api/v1/upload_file'), {
-    method: 'POST',
-    headers: { 'x-api-key': apiKey },
-    body: fd
-  });
-  if (!res.ok) {
-    const txt = await res.text();
-    throw new Error(`Upload failed ${res.status}: ${txt.slice(0,100)}`);
+function announceReady(){postHost('ready',{app:'OpenGen Studio'});}
+function safeHttpsUrl(value,{result=false}={}){
+  try{
+    const u=new URL(String(value||''));
+    if(u.protocol!=='https:'||u.username||u.password)return null;
+    const h=u.hostname.toLowerCase();
+    if(!h||h==='localhost'||h.endsWith('.local')||/^\d+\.\d+\.\d+\.\d+$/.test(h))return null;
+    if(result&&!RESULT_HOST_SUFFIXES.some(x=>h===x||h.endsWith('.'+x)))return null;
+    return u.toString();
+  }catch(_){return null;}
+}
+function allowedInputUrl(value){
+  const safe=safeHttpsUrl(value);if(!safe)return null;
+  return /\.(?:jpe?g|png|webp)$/i.test(new URL(safe).pathname)?safe:null;
+}
+async function hostRpc(action,payload={},signal){
+  if(window.parent===window){
+    const ctrl=new AbortController();
+    const abort=()=>ctrl.abort();
+    if(signal){
+      if(signal.aborted){const e=new Error('Generación cancelada');e.name='AbortError';throw e;}
+      signal.addEventListener('abort',abort,{once:true});
+    }
+    const timer=setTimeout(()=>ctrl.abort(),50000);
+    try{
+      const r=await fetch('https://proxy.thelab.solutions/visual-ai/rpc',{
+        method:'POST',credentials:'include',redirect:'error',signal:ctrl.signal,
+        headers:{'Content-Type':'application/json'},body:JSON.stringify({action,...payload})
+      });
+      const data=await r.json().catch(()=>({error:'Respuesta inválida del proxy TLS'}));
+      if(!r.ok){const e=new Error(data.error||('Error del backend ('+r.status+')'));e.status=r.status;e.code=data.code||'';e.transient=!!data.transient;throw e;}
+      return data;
+    }finally{
+      clearTimeout(timer);
+      if(signal)signal.removeEventListener('abort',abort);
+    }
   }
-  const data = await res.json();
-  const url = data.url || data.file_url || data.data?.url;
-  if (!url) throw new Error('MuAPI upload did not return a URL');
+  if(!hostReady)return Promise.reject(new Error('El dashboard todavía no confirmó el canal seguro'));
+  const requestId='rpc_'+Date.now().toString(36)+'_'+(++rpcSeq).toString(36);
+  return new Promise((resolve,reject)=>{
+    const timer=setTimeout(()=>{rpcPending.delete(requestId);reject(new Error('El dashboard no respondió a tiempo'));},50000);
+    const onAbort=()=>{clearTimeout(timer);rpcPending.delete(requestId);const e=new Error('Generación cancelada');e.name='AbortError';reject(e);};
+    if(signal){
+      if(signal.aborted){onAbort();return;}
+      signal.addEventListener('abort',onAbort,{once:true});
+    }
+    rpcPending.set(requestId,{resolve,reject,timer,signal,onAbort});
+    postHost('rpc',{requestId,action,payload});
+  });
+}
+window.addEventListener('message',event=>{
+  if(event.origin!==HOST_ORIGIN||event.source!==window.parent)return;
+  const msg=event.data;
+  if(!msg||msg.source!=='tls-dashboard'||msg.version!==PROTOCOL_VERSION)return;
+  if(msg.type==='host-ready'){
+    hostReady=true;
+    const key=document.getElementById('key-btn');
+    if(key){key.textContent='🔒 Backend seguro';key.className='top-btn key-ok';}
+    const cap=document.getElementById('cost-status');
+    if(cap)cap.textContent='Backend TLS activo · consultando cuota…';
+    hostRpc('quota',{}).then(q=>{if(cap)cap.textContent='Cuota diaria segura: '+(q.daily_limit||'—')+' generaciones';}).catch(()=>{});
+    updateGenBtn();return;
+  }
+  if(msg.type==='pause'){currentJobController?.abort();return;}
+  if(msg.type!=='rpc-result'||typeof msg.requestId!=='string')return;
+  const p=rpcPending.get(msg.requestId);if(!p)return;
+  rpcPending.delete(msg.requestId);clearTimeout(p.timer);
+  if(p.signal)p.signal.removeEventListener('abort',p.onAbort);
+  if(msg.ok)p.resolve(msg.data||{});
+  else{
+    const e=new Error(msg.data?.error||('Error del backend ('+(msg.status||0)+')'));
+    e.status=msg.status||0;e.code=msg.data?.code||'';e.transient=!!msg.data?.transient;p.reject(e);
+  }
+});
+async function uploadImageForAPI(base64DataUrl,signal){
+  const compressed=await compressImage(base64DataUrl,1280,0.88);
+  const data=await hostRpc('upload',{dataUrl:compressed},signal);
+  const url=safeHttpsUrl(data.url,{result:true});
+  if(!url)throw new Error('El backend devolvió una URL de imagen no permitida');
   return url;
 }
 
@@ -520,17 +565,13 @@ async function compressImage(dataUrl, maxSize = 1024, quality = 0.85) {
 
 // ─── INIT ─────────────────────────────────────────────────────────────────
 function handleUrlInput(val) {
-  val = val.trim();
-  if (!val) return;
-  // Basic URL validation
-  try { new URL(val); } catch(e) { return; }
-  uploadedImageUrl = val;
-  uploadedIsUrl = true;
-  // Show preview
-  document.getElementById('upload-zone').style.display = 'none';
-  document.getElementById('upload-preview').style.display = 'block';
-  document.getElementById('upload-img').src = val;
-  updateGenBtn();
+  val=val.trim();
+  if(!val){if(uploadedIsUrl)clearUpload();return;}
+  const safe=allowedInputUrl(val);if(!safe)return;
+  uploadedImageUrl=safe;uploadedIsUrl=true;
+  document.getElementById('upload-zone').style.display='none';
+  document.getElementById('upload-preview').style.display='block';
+  document.getElementById('upload-img').src=safe;updateGenBtn();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -538,9 +579,23 @@ document.addEventListener('DOMContentLoaded', () => {
   switchSection('t2i');
   document.getElementById('prompt-ta').addEventListener('input', onPromptInput);
   document.getElementById('prompt-ta').addEventListener('keydown', e => { if(e.key==='Enter' && (e.metaKey||e.ctrlKey)) generate(); });
-  document.getElementById('modal-input').addEventListener('input', () => {
-    document.getElementById('modal-confirm').disabled = !document.getElementById('modal-input').value.trim();
-  });
+  document.getElementById('rights-confirm')?.addEventListener('change',updateGenBtn);
+  if(window.parent===window){
+    const key=document.getElementById('key-btn'),cap=document.getElementById('cost-status');
+    if(key)key.textContent='🔒 Conectando Access…';
+    hostRpc('quota',{}).then(q=>{
+      hostReady=true;
+      if(key){key.textContent='🔒 Backend seguro';key.className='top-btn key-ok';}
+      if(cap)cap.textContent='Cuota diaria segura: '+(q.daily_limit||'—')+' generaciones';
+      updateGenBtn();
+    }).catch(err=>{
+      if(key){key.textContent='⚠ Abre sesión en dashboard';key.className='top-btn key-err';}
+      if(cap)cap.textContent='No se pudo validar Cloudflare Access: '+String(err.message||err).slice(0,100);
+    });
+  }else{
+    announceReady();
+    setTimeout(announceReady,500);
+  }
 });
 
 function buildPills(){
@@ -584,6 +639,7 @@ function buildPills(){
 
 // ─── SECTION SWITCH ──────────────────────────────────────────────────────────
 function switchSection(sec) {
+  if(generating&&sec!==currentSection){setResultError('Cancela la generación actual antes de cambiar de herramienta.');return;}
   currentSection = sec;
   const info = SECTIONS[sec];
 
@@ -658,36 +714,47 @@ function fillExample(){
 }
 
 function updateGenBtn(){
-  const info = SECTIONS[currentSection];
-  const hasPrompt = info.noPrompt || !!document.getElementById('prompt-ta').value.trim();
-  const hasImg = !info.needImg || !!uploadedImageUrl;
-  const btn = document.getElementById('gen-btn');
-  btn.disabled = generating || !hasPrompt || !hasImg;
-  const icon = info.icon;
-  btn.textContent = generating ? 'Generando...' : `${icon} Generar`;
+  const info=SECTIONS[currentSection];
+  const hasPrompt=info.noPrompt||!!document.getElementById('prompt-ta').value.trim();
+  const hasImg=!info.needImg||!!uploadedImageUrl;
+  const rights=!!document.getElementById('rights-confirm')?.checked;
+  const btn=document.getElementById('gen-btn');
+  btn.disabled=!generating&&(!hostReady||!hasPrompt||!hasImg||!rights);
+  btn.textContent=generating?'■ Cancelar':`${info.icon} Generar`;
 }
 
+// ─── UPLOAD
 // ─── UPLOAD ───────────────────────────────────────────────────────────────────
 function handleFileInput(e){
   const file = e.target.files[0]; if(!file) return;
   readFile(file);
 }
 function handleDrop(e){
-  e.preventDefault();
-  document.getElementById('upload-zone').classList.remove('drag');
-  const file = e.dataTransfer.files[0]; if(!file||!file.type.startsWith('image/')) return;
-  readFile(file);
+  e.preventDefault();document.getElementById('upload-zone').classList.remove('drag');
+  const file=e.dataTransfer.files[0];if(file)void readFile(file);
 }
-function readFile(file){
-  const reader = new FileReader();
-  reader.onload = ev => {
-    uploadedImageUrl = ev.target.result;
-    document.getElementById('upload-zone').style.display = 'none';
-    document.getElementById('upload-preview').style.display = 'block';
-    document.getElementById('upload-img').src = uploadedImageUrl;
-    updateGenBtn();
-  };
-  reader.readAsDataURL(file);
+async function readFile(file){
+  try{
+    const allowed=new Set(['image/jpeg','image/png','image/webp']);
+    if(!file||!allowed.has(file.type))throw new Error('Solo se permiten JPG, PNG o WEBP.');
+    if(!/\.(?:jpe?g|png|webp)$/i.test(file.name||''))throw new Error('La extensión del archivo no coincide con un formato permitido.');
+    if(file.size<=0||file.size>8*1024*1024)throw new Error('La imagen debe pesar máximo 8 MB.');
+    const head=new Uint8Array(await file.slice(0,16).arrayBuffer());
+    const jpeg=head[0]===0xff&&head[1]===0xd8&&head[2]===0xff;
+    const png=head[0]===0x89&&head[1]===0x50&&head[2]===0x4e&&head[3]===0x47;
+    const webp=head.length>=12&&String.fromCharCode(...head.slice(0,4))==='RIFF'&&String.fromCharCode(...head.slice(8,12))==='WEBP';
+    if(!(jpeg||png||webp))throw new Error('La firma real del archivo no es una imagen permitida.');
+    const bitmap=typeof createImageBitmap==='function'?await createImageBitmap(file):null;
+    if(bitmap){
+      if(bitmap.width>8192||bitmap.height>8192||bitmap.width*bitmap.height>32_000_000){bitmap.close();throw new Error('La imagen supera el límite de dimensiones.');}
+      bitmap.close();
+    }
+    const data=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=()=>reject(new Error('No se pudo leer la imagen'));r.readAsDataURL(file);});
+    uploadedImageUrl=String(data);uploadedIsUrl=false;
+    document.getElementById('upload-zone').style.display='none';
+    document.getElementById('upload-preview').style.display='block';
+    document.getElementById('upload-img').src=uploadedImageUrl;updateGenBtn();
+  }catch(err){setResultError(err.message);clearUpload();}
 }
 function clearUpload(){
   uploadedImageUrl = null;
@@ -702,18 +769,18 @@ function clearUpload(){
 
 // ─── GENERATE ────────────────────────────────────────────────────────────────
 async function generate(){
-  if(!apiKey){ openModal(); return; }
-  const info = SECTIONS[currentSection];
-  const prompt = document.getElementById('prompt-ta').value.trim();
-  const models = MODELS[currentSection]||[];
-  const modelId = selectedModel[currentSection]||models[0]?.id;
-  const model = models.find(m=>m.id===modelId)||models[0];
-  if(!model) return;
-
-  generating = true; updateGenBtn();
-  setResultLoading(); setProgress(10);
-
-  // Map of model IDs to their required image field name
+  if(generating){cancelGeneration();return;}
+  if(!hostReady){setResultError('Abre OpenGen desde el dashboard para usar el backend seguro.');return;}
+  if(!document.getElementById('rights-confirm')?.checked){setResultError('Confirma los derechos y permisos del material antes de generar.');return;}
+  const section=currentSection,info={...SECTIONS[section]},prompt=document.getElementById('prompt-ta').value.trim();
+  const models=MODELS[section]||[],modelId=selectedModel[section]||models[0]?.id,model=models.find(m=>m.id===modelId)||models[0];
+  if(!model)return;
+  const snap={section,info,prompt,model,modelId,image:uploadedImageUrl,isUrl:uploadedIsUrl,
+    imgRatio:currentImgRatio,vidRatio:currentVidRatio,duration:currentDuration,resolution:currentResolution};
+  if((info.isVid||info.isAudio)&&!confirm('Esta generación de '+(info.isVid?'video':'audio')+' puede consumir más cuota. ¿Continuar?'))return;
+  const controller=new AbortController();currentJobController=controller;generating=true;updateGenBtn();
+  const started=Date.now(),jobId='vai_'+(crypto.randomUUID?crypto.randomUUID().replace(/[^A-Za-z0-9_-]/g,''):Date.now().toString(36)+Math.random().toString(36).slice(2));
+  postHost('job-start',{jobId,section,model:model.name});setResultLoading();setProgress(10);
   const IMAGE_FIELDS = {
     'flux-kontext-dev-i2i':'images_list','flux-kontext-pro-i2i':'images_list','flux-kontext-max-i2i':'images_list',
     'gpt4o-image-to-image':'images_list','nano-banana-edit':'images_list','nano-banana-pro-edit':'images_list',
@@ -733,71 +800,59 @@ async function generate(){
     'seedance-v2.0-i2v':'images_list',
     'ai-dress-change':'model_image_url','ai-product-photography':'person_image_url',
   };
-
-  const body = {};
-  if(prompt) body.prompt = prompt;
-  if(uploadedImageUrl && info.needImg){
-    let imageUrlForAPI = uploadedImageUrl;
-    // If it's a base64 data URL, we need to upload it to get a real URL
-    if(uploadedImageUrl.startsWith('data:') && !uploadedIsUrl) {
-      try {
-        setResultLoading();
-        setLoadingText('Subiendo imagen...');
-        imageUrlForAPI = await uploadImageForAPI(uploadedImageUrl);
-      } catch(err) {
-        setResultError('Error subiendo imagen: ' + err.message + '<br><small>💡 Tip: usa el campo "O PEGA URL" con un enlace directo a la imagen</small>');
-        generating = false; updateGenBtn();
-        return;
-      }
+  const body={};if(prompt)body.prompt=prompt;
+  try{
+    if(snap.image&&info.needImg){
+      let imageUrl=snap.image;
+      if(imageUrl.startsWith('data:')&&!snap.isUrl){setLoadingText('Subiendo imagen de forma segura…');imageUrl=await uploadImageForAPI(imageUrl,controller.signal);}
+      else{imageUrl=allowedInputUrl(imageUrl);if(!imageUrl)throw new Error('La URL de entrada no cumple la política HTTPS de imágenes.');}
+      const imgField=IMAGE_FIELDS[modelId]||'image_url';
+      if(imgField==='images_list')body.images_list=[imageUrl];else body[imgField]=imageUrl;
     }
-    const imgField = IMAGE_FIELDS[modelId] || 'image_url';
-    if(imgField === 'images_list') body.images_list = [imageUrlForAPI];
-    else body[imgField] = imageUrlForAPI;
-  }
-  if(info.isVid){ body.aspect_ratio=currentVidRatio; body.duration=currentDuration; body.resolution=currentResolution; }
-  else if(!info.isAudio && !info.noPrompt){ body.aspect_ratio=currentImgRatio; }
+    if(info.isVid){body.aspect_ratio=snap.vidRatio;body.duration=snap.duration;body.resolution=snap.resolution;}
+    else if(!info.isAudio&&!info.noPrompt)body.aspect_ratio=snap.imgRatio;
 
-  try {
-    const res = await fetch(`https://corsproxy.io/?url=${encodeURIComponent(`https://api.muapi.ai/api/v1/${model.ep}`)}`, {
-      method:'POST', headers:{'Content-Type':'application/json','x-api-key':apiKey},
-      body: JSON.stringify(body)
-    });
-    if(!res.ok){ const t=await res.text(); throw new Error(`Error ${res.status}: ${t.slice(0,120)}`); }
-    const data = await res.json();
-    const reqId = data.request_id || data.id;
-    if(!reqId) throw new Error('No se recibió request_id');
-
-    setProgress(30);
-    let attempts=0;
-    while(attempts<90){
-      await sleep(2500); attempts++;
-      setProgress(Math.min(92, 30+attempts*1.5));
-      const poll = await fetch(`https://corsproxy.io/?url=${encodeURIComponent(`https://api.muapi.ai/api/v1/predictions/${reqId}/result`)}`,{headers:{'x-api-key':apiKey}});
-      const pd = await poll.json();
-      if(pd.status==='completed'||pd.status==='succeeded'){
-        const url = pd.url||pd.outputs?.[0]||pd.output?.[0];
-        if(!url) throw new Error('No URL en respuesta');
-        const type = info.isAudio ? 'audio' : (info.isVid||currentSection==='vfx') ? 'video' : 'image';
-        const item = {url,type,model:model.name,sec:currentSection,prompt,time:Date.now()};
-        setProgress(100);
-        setResultMedia(item);
-        addToHistory(item);
-        break;
-      } else if(pd.status==='failed'||pd.status==='error'){
-        throw new Error(pd.error||'La generación falló en el servidor');
+    const created=await hostRpc('generate',{endpoint:model.ep,payload:body,jobId},controller.signal);
+    const reqId=created.request_id;if(!reqId)throw new Error('El backend no devolvió request_id.');
+    const cap=document.getElementById('cost-status');
+    if(cap&&created.quota)cap.textContent=`Cuota diaria: ${created.quota.used||0}/${created.quota.limit||'—'} generaciones`;
+    setProgress(30);postHost('job-progress',{jobId,progress:30});
+    let attempt=0,delay=1800,done=false;
+    while(Date.now()-started<4*60*1000){
+      await sleep(delay,controller.signal);attempt++;delay=Math.min(8000,Math.round(delay*1.35));
+      const pct=Math.min(94,30+attempt*2);setProgress(pct);postHost('job-progress',{jobId,progress:pct});
+      let pd;
+      try{pd=await hostRpc('poll',{requestId:reqId},controller.signal);}
+      catch(err){if((err.transient||err.status===502)&&attempt<5)continue;throw err;}
+      if(['completed','succeeded'].includes(pd.status)){
+        const url=safeHttpsUrl(pd.url,{result:true});if(!url)throw new Error('El proveedor no entregó una URL de resultado permitida.');
+        const type=info.isAudio?'audio':(info.isVid||section==='vfx')?'video':'image';
+        const item={url,type,model:model.name,sec:section,prompt,time:Date.now(),jobId,
+          durationMs:Date.now()-started,costUsd:Number.isFinite(Number(pd.cost_usd))?Number(pd.cost_usd):null};
+        setProgress(100);setResultMedia(item);addToHistory(item);postHost('job-complete',{jobId,asset:item});done=true;break;
       }
+      if(['failed','error'].includes(pd.status))throw new Error(pd.error||'La generación falló en el proveedor.');
     }
-    if(attempts>=90) throw new Error('Tiempo de espera agotado (3.5 min)');
-  } catch(err){
-    setResultError(err.message);
-  } finally {
-    generating=false; updateGenBtn();
-    setTimeout(()=>{ document.getElementById('progress-bar-wrap').style.display='none'; },1200);
+    if(!done)throw new Error('Tiempo de espera agotado (4 min).');
+  }catch(err){
+    const cancelled=err?.name==='AbortError';
+    setResultError(cancelled?'Generación cancelada.':err.message);
+    postHost('job-error',{jobId,error:cancelled?'cancelled':String(err.message||err)});
+  }finally{
+    generating=false;if(currentJobController===controller)currentJobController=null;updateGenBtn();
+    setTimeout(()=>{const p=document.getElementById('progress-bar-wrap');if(p)p.style.display='none';},1200);
   }
 }
+function cancelGeneration(){currentJobController?.abort();}
 
-function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+function sleep(ms,signal){
+  return new Promise((resolve,reject)=>{
+    const t=setTimeout(resolve,ms);
+    if(signal)signal.addEventListener('abort',()=>{clearTimeout(t);const e=new Error('Generación cancelada');e.name='AbortError';reject(e);},{once:true});
+  });
+}
 
+// ─── RESULT
 // ─── RESULT ───────────────────────────────────────────────────────────────────
 function setProgress(pct){
   progress=pct;
@@ -842,30 +897,38 @@ function setResultLoading(){
 }
 
 function setResultError(msg){
-  document.getElementById('result-content').innerHTML = `
-    <div class="result-error">
-      <div style="font-size:36px">⚠</div>
-      <div style="color:var(--r);font-weight:600">Error al generar</div>
-      <div style="color:var(--tx3);font-size:12px;max-width:280px">${msg}</div>
-    </div>`;
+  const root=document.getElementById('result-content');root.replaceChildren();
+  const box=document.createElement('div');box.className='result-error';
+  const icon=document.createElement('div');icon.style.fontSize='36px';icon.textContent='⚠';
+  const title=document.createElement('div');title.style.cssText='color:var(--r);font-weight:600';title.textContent='Error al generar';
+  const detail=document.createElement('div');detail.style.cssText='color:var(--tx3);font-size:12px;max-width:320px;white-space:pre-wrap';detail.textContent=String(msg||'Error desconocido').slice(0,800);
+  box.append(icon,title,detail);root.appendChild(box);
 }
-
 function setResultMedia(item){
-  let media = '';
-  if(item.type==='video'){
-    media = `<video src="${item.url}" controls autoplay loop style="width:100%;max-height:460px;object-fit:contain;border-radius:12px;background:#000"></video>`;
-  } else if(item.type==='audio'){
-    media = `<div class="result-audio-wrap"><div style="font-size:30px">♪</div><audio src="${item.url}" controls style="flex:1;height:38px"></audio></div>`;
-  } else {
-    media = `<img src="${item.url}" alt="result" style="width:100%;max-height:460px;object-fit:contain;border-radius:12px;background:#000">`;
+  const url=safeHttpsUrl(item?.url,{result:true});if(!url){setResultError('URL de resultado no permitida.');return;}
+  const root=document.getElementById('result-content');root.replaceChildren();
+  const wrap=document.createElement('div');wrap.className='result-media';
+  let media;
+  if(item.type==='video'){media=document.createElement('video');media.controls=true;media.autoplay=true;media.loop=true;}
+  else if(item.type==='audio'){
+    const aw=document.createElement('div');aw.className='result-audio-wrap';
+    const note=document.createElement('div');note.style.fontSize='30px';note.textContent='♪';
+    media=document.createElement('audio');media.controls=true;media.style.cssText='flex:1;height:38px';aw.append(note,media);wrap.appendChild(aw);
+  }else{media=document.createElement('img');media.alt='Resultado generado';}
+  media.src=url;if(item.type!=='audio')media.style.cssText='width:100%;max-height:460px;object-fit:contain;border-radius:12px;background:#000';
+  if(item.type!=='audio')wrap.appendChild(media);
+  const dl=document.createElement('a');dl.href=url;dl.target='_blank';dl.rel='noopener noreferrer';dl.download='';dl.className='result-dl';
+  dl.textContent='↓ Descargar '+(item.type==='video'?'video':item.type==='audio'?'audio':'imagen');wrap.appendChild(dl);
+  if(window.parent!==window){
+    const use=document.createElement('button');use.type='button';use.className='result-dl';use.style.marginLeft='8px';use.textContent='↗ Vincular al dashboard';
+    use.addEventListener('click',()=>postHost('asset-selected',{asset:{url,type:item.type,model:item.model,jobId:item.jobId||''}}));wrap.appendChild(use);
   }
-  document.getElementById('result-content').innerHTML = `
-    <div class="result-media">
-      ${media}
-      <a href="${item.url}" target="_blank" download class="result-dl">↓ Descargar ${item.type==='video'?'video':item.type==='audio'?'audio':'imagen'}</a>
-    </div>`;
+  const meta=document.createElement('div');meta.style.cssText='font-size:10px;color:var(--tx3);margin-top:7px';
+  meta.textContent='Generado en '+Math.max(1,Math.round((item.durationMs||0)/1000))+' s'+(item.costUsd!=null?' · costo proveedor US$ '+item.costUsd.toFixed(3):' · costo real no reportado por proveedor');
+  wrap.appendChild(meta);root.appendChild(wrap);
 }
 
+// ─── HISTORY
 // ─── HISTORY ─────────────────────────────────────────────────────────────────
 function addToHistory(item){
   history.unshift(item);
@@ -875,16 +938,15 @@ function addToHistory(item){
 }
 
 function renderHistory(){
-  const list = document.getElementById('hist-list');
-  if(history.length===0){ list.innerHTML='<div class="hist-empty">Sin historial aún</div>'; return; }
-  list.innerHTML = history.map((item,i) => {
-    const thumb = item.type==='image'
-      ? `<img src="${item.url}" alt="">`
-      : `<div class="hist-item-placeholder">${item.type==='audio'?'♪':'▶'}</div>`;
-    return `<div class="hist-item ${historySelectedIdx===i?'selected':''}" onclick="selectHistory(${i})">${thumb}<div class="hist-item-label">${item.model}</div></div>`;
-  }).join('');
+  const list=document.getElementById('hist-list');list.replaceChildren();
+  if(!history.length){const e=document.createElement('div');e.className='hist-empty';e.textContent='Sin historial en esta sesión';list.appendChild(e);return;}
+  history.forEach((item,i)=>{
+    const row=document.createElement('div');row.className='hist-item'+(historySelectedIdx===i?' selected':'');row.addEventListener('click',()=>selectHistory(i));
+    if(item.type==='image'){const img=document.createElement('img');const url=safeHttpsUrl(item.url,{result:true});if(url)img.src=url;img.alt='';row.appendChild(img);}
+    else{const p=document.createElement('div');p.className='hist-item-placeholder';p.textContent=item.type==='audio'?'♪':'▶';row.appendChild(p);}
+    const label=document.createElement('div');label.className='hist-item-label';label.textContent=String(item.model||'Resultado').slice(0,120);row.appendChild(label);list.appendChild(row);
+  });
 }
-
 function selectHistory(i){
   historySelectedIdx = i;
   setResultMedia(history[i]);
@@ -899,31 +961,7 @@ function toggleHistory(){
   btn.classList.toggle('hist-on', showingHistory);
 }
 
-// ─── MODAL ────────────────────────────────────────────────────────────────────
-function openModal(){
-  document.getElementById('modal-overlay').classList.remove('hidden');
-  document.getElementById('modal-input').value = '';
-  document.getElementById('modal-confirm').disabled = true;
-  document.getElementById('modal-del').style.display = apiKey ? 'block' : 'none';
-  setTimeout(()=>document.getElementById('modal-input').focus(), 50);
-}
-function closeModal(){ document.getElementById('modal-overlay').classList.add('hidden'); }
-function saveKey(){
-  const v = document.getElementById('modal-input').value.trim();
-  if(!v) return;
-  apiKey = v;
-  document.getElementById('key-btn').textContent = '✓ Key';
-  document.getElementById('key-btn').className = 'top-btn key-ok';
-  closeModal(); updateGenBtn();
-}
-function deleteKey(){
-  apiKey='';
-  document.getElementById('key-btn').textContent = '⚠ API Key';
-  document.getElementById('key-btn').className = 'top-btn key-err';
-  closeModal(); updateGenBtn();
-}
-document.getElementById('modal-overlay').addEventListener('click', e => { if(e.target===document.getElementById('modal-overlay')) closeModal(); });
-document.getElementById('modal-input').addEventListener('keydown', e => { if(e.key==='Enter' && apiKey) saveKey(); });
+// OpenGen no almacena ni solicita credenciales del proveedor en el navegador.
 </script>
 </body>
 </html>
